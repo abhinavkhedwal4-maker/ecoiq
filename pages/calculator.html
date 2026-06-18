@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#22c55e"/>
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="EcoIQ — Your Carbon Footprint AI"/>
+  <meta property="og:description" content="Track and reduce your carbon footprint with AI-powered insights. Calculate, track and reduce your environmental impact."/>
+  <meta name="description" content="Calculate your personal carbon footprint across transport, food, energy and shopping"/>
+  <title>Carbon Calculator — EcoIQ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css"/>
+  <link rel="stylesheet" href="../css/calculator.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <a class="nav-logo" href="../index.html" aria-label="EcoIQ home">
+      <span class="logo-icon" aria-hidden="true">🌱</span>
+      <span class="logo-text">EcoIQ</span>
+    </a>
+    <ul class="nav-links" role="menubar">
+      <li role="none"><a href="../index.html" role="menuitem">Home</a></li>
+      <li role="none"><a href="calculator.html" class="active" role="menuitem">Calculator</a></li>
+      <li role="none"><a href="tracker.html" role="menuitem">Tracker</a></li>
+      <li role="none"><a href="insights.html" role="menuitem">Insights</a></li>
+      <li role="none"><a href="quiz.html" role="menuitem">Quiz</a></li>
+    </ul>
+    <button class="chat-toggle-btn" onclick="toggleChat()" aria-label="Open AI assistant" aria-expanded="false" id="chatToggleBtn">
+      🤖 Ask EcoAI
+    </button>
+  </nav>
+
+  <div class="page-hero" id="main-content">
+    <div class="section-label">Step 1 of Your Green Journey</div>
+    <h1>Carbon Footprint<br/><span style="color:var(--green)">Calculator</span></h1>
+    <p>Answer a few simple questions to discover your annual carbon footprint and get personalized AI-powered tips.</p>
+  </div>
+
+  <div class="page-content">
+    <div class="calc-progress" role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0" aria-label="Calculator progress">
+      <div class="progress-steps">
+        <div class="progress-step active" data-step="1" aria-label="Step 1 Transport"><span aria-hidden="true">🚗</span> Transport</div>
+        <div class="progress-step" data-step="2" aria-label="Step 2 Food"><span aria-hidden="true">🍽️</span> Food</div>
+        <div class="progress-step" data-step="3" aria-label="Step 3 Energy"><span aria-hidden="true">⚡</span> Energy</div>
+        <div class="progress-step" data-step="4" aria-label="Step 4 Shopping"><span aria-hidden="true">🛍️</span> Shopping</div>
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progressFill" style="width:25%"></div>
+      </div>
+    </div>
+
+    <div class="calc-step active" id="step1" role="region" aria-labelledby="step1Title">
+      <h2 id="step1Title">🚗 Transport</h2>
+      <p class="step-desc">How do you usually get around?</p>
+      <div class="question-group">
+        <label for="carKm" class="question-label">How many km do you drive per week?<span class="question-hint">Enter 0 if you don't drive</span></label>
+        <input type="number" id="carKm" min="0" max="5000" value="0" class="calc-input" aria-describedby="carKmHint" placeholder="e.g. 100"/>
+        <span id="carKmHint" class="sr-only">Enter kilometres driven per week</span>
+      </div>
+      <div class="question-group">
+        <label class="question-label">What type of vehicle?</label>
+        <div class="option-pills" role="radiogroup" aria-label="Vehicle type">
+          <button class="pill active" data-group="carType" data-value="petrol" role="radio" aria-checked="true">⛽ Petrol</button>
+          <button class="pill" data-group="carType" data-value="diesel" role="radio" aria-checked="false">🛢️ Diesel</button>
+          <button class="pill" data-group="carType" data-value="electric" role="radio" aria-checked="false">⚡ Electric</button>
+          <button class="pill" data-group="carType" data-value="none" role="radio" aria-checked="false">🚶 No Car</button>
+        </div>
+      </div>
+      <div class="question-group">
+        <label for="flightsPerYear" class="question-label">How many flights do you take per year?</label>
+        <input type="number" id="flightsPerYear" min="0" max="100" value="0" class="calc-input" placeholder="e.g. 2" aria-describedby="flightsHint"/>
+        <span id="flightsHint" class="sr-only">Enter number of flights per year</span>
+      </div>
+      <div class="question-group">
+        <label class="question-label">Do you use public transport regularly?</label>
+        <div class="option-pills" role="radiogroup" aria-label="Public transport usage">
+          <button class="pill active" data-group="publicTransport" data-value="yes" role="radio" aria-checked="true">✅ Yes</button>
+          <button class="pill" data-group="publicTransport" data-value="no" role="radio" aria-checked="false">❌ No</button>
+        </div>
+      </div>
+      <button class="btn btn-primary calc-next" onclick="nextStep(2)" aria-label="Continue to food section">Next: Food →</button>
+    </div>
+
+    <div class="calc-step" id="step2" role="region" aria-labelledby="step2Title">
+      <h2 id="step2Title">🍽️ Food</h2>
+      <p class="step-desc">Your diet has a big impact on your footprint.</p>
+      <div class="question-group">
+        <label class="question-label">What best describes your diet?</label>
+        <div class="option-pills" role="radiogroup" aria-label="Diet type">
+          <button class="pill" data-group="diet" data-value="vegan" role="radio" aria-checked="false">🌱 Vegan</button>
+          <button class="pill" data-group="diet" data-value="vegetarian" role="radio" aria-checked="false">🥗 Vegetarian</button>
+          <button class="pill active" data-group="diet" data-value="mixed" role="radio" aria-checked="true">🍱 Mixed</button>
+          <button class="pill" data-group="diet" data-value="meat_heavy" role="radio" aria-checked="false">🥩 Meat Heavy</button>
+        </div>
+      </div>
+      <div class="question-group">
+        <label class="question-label">How often do you eat beef or lamb per week?</label>
+        <div class="option-pills" role="radiogroup" aria-label="Beef/lamb consumption frequency">
+          <button class="pill active" data-group="beefFreq" data-value="never" role="radio" aria-checked="true">Never</button>
+          <button class="pill" data-group="beefFreq" data-value="once" role="radio" aria-checked="false">1-2x</button>
+          <button class="pill" data-group="beefFreq" data-value="often" role="radio" aria-checked="false">3-5x</button>
+          <button class="pill" data-group="beefFreq" data-value="daily" role="radio" aria-checked="false">Daily</button>
+        </div>
+      </div>
+      <div class="question-group">
+        <label class="question-label">How much food do you waste?</label>
+        <div class="option-pills" role="radiogroup" aria-label="Food waste amount">
+          <button class="pill" data-group="foodWaste" data-value="low" role="radio" aria-checked="false">🌟 Very Little</button>
+          <button class="pill active" data-group="foodWaste" data-value="medium" role="radio" aria-checked="true">📊 Average</button>
+          <button class="pill" data-group="foodWaste" data-value="high" role="radio" aria-checked="false">⚠️ A Lot</button>
+        </div>
+      </div>
+      <div class="calc-nav">
+        <button class="btn btn-ghost" onclick="prevStep(1)" aria-label="Go back to transport section">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep(3)" aria-label="Continue to energy section">Next: Energy →</button>
+      </div>
+    </div>
+
+    <div class="calc-step" id="step3" role="region" aria-labelledby="step3Title">
+      <h2 id="step3Title">⚡ Energy</h2>
+      <p class="step-desc">Your home energy use matters.</p>
+      <div class="question-group">
+        <label for="electricityBill" class="question-label">Monthly electricity bill (₹)?</label>
+        <input type="number" id="electricityBill" min="0" max="50000" value="1500" class="calc-input" placeholder="e.g. 1500" aria-describedby="electricityHint"/>
+        <span id="electricityHint" class="sr-only">Enter your monthly electricity bill in rupees</span>
+      </div>
+      <div class="question-group">
+        <label class="question-label">Do you use renewable energy (solar panels)?</label>
+        <div class="option-pills" role="radiogroup" aria-label="Renewable energy usage">
+          <button class="pill" data-group="renewable" data-value="yes" role="radio" aria-checked="false">☀️ Yes</button>
+          <button class="pill active" data-group="renewable" data-value="no" role="radio" aria-checked="true">❌ No</button>
+        </div>
+      </div>
+      <div class="question-group">
+        <label class="question-label">Home heating/cooling usage?</label>
+        <div class="option-pills" role="radiogroup" aria-label="Heating and cooling usage">
+          <button class="pill" data-group="hvac" data-value="low" role="radio" aria-checked="false">🌡️ Minimal</button>
+          <button class="pill active" data-group="hvac" data-value="medium" role="radio" aria-checked="true">📊 Moderate</button>
+          <button class="pill" data-group="hvac" data-value="high" role="radio" aria-checked="false">❄️ Heavy AC/Heat</button>
+        </div>
+      </div>
+      <div class="calc-nav">
+        <button class="btn btn-ghost" onclick="prevStep(2)" aria-label="Go back to food section">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep(4)" aria-label="Continue to shopping section">Next: Shopping →</button>
+      </div>
+    </div>
+
+    <div class="calc-step" id="step4" role="region" aria-labelledby="step4Title">
+      <h2 id="step4Title">🛍️ Shopping</h2>
+      <p class="step-desc">Consumer goods have a hidden carbon cost.</p>
+      <div class="question-group">
+        <label class="question-label">How often do you buy new clothes?</label>
+        <div class="option-pills" role="radiogroup" aria-label="New clothes purchase frequency">
+          <button class="pill" data-group="clothes" data-value="rarely" role="radio" aria-checked="false">✅ Rarely</button>
+          <button class="pill active" data-group="clothes" data-value="monthly" role="radio" aria-checked="true">📅 Monthly</button>
+          <button class="pill" data-group="clothes" data-value="weekly" role="radio" aria-checked="false">🛍️ Weekly</button>
+        </div>
+      </div>
+      <div class="question-group">
+        <label class="question-label">How often do you buy new electronics?</label>
+        <div class="option-pills" role="radiogroup" aria-label="New electronics purchase frequency">
+          <button class="pill" data-group="electronics" data-value="rarely" role="radio" aria-checked="false">✅ Rarely (every few years)</button>
+          <button class="pill active" data-group="electronics" data-value="yearly" role="radio" aria-checked="true">📅 Yearly</button>
+          <button class="pill" data-group="electronics" data-value="often" role="radio" aria-checked="false">🛍️ Very Often</button>
+        </div>
+      </div>
+      <div class="question-group">
+        <label class="question-label">Do you repair items instead of replacing them?</label>
+        <div class="option-pills" role="radiogroup" aria-label="Repair vs replace habit">
+          <button class="pill" data-group="repair" data-value="always" role="radio" aria-checked="false">🌟 Always</button>
+          <button class="pill active" data-group="repair" data-value="sometimes" role="radio" aria-checked="true">📊 Sometimes</button>
+          <button class="pill" data-group="repair" data-value="never" role="radio" aria-checked="false">❌ Never</button>
+        </div>
+      </div>
+      <div class="calc-nav">
+        <button class="btn btn-ghost" onclick="prevStep(3)" aria-label="Go back to energy section">← Back</button>
+        <button class="btn btn-primary" onclick="calculateFootprint()" aria-label="Calculate my carbon footprint">🧮 Calculate My Footprint</button>
+      </div>
+    </div>
+
+    <div class="calc-result hidden" id="calcResult" role="region" aria-labelledby="resultTitle" aria-live="polite">
+      <div class="result-header">
+        <div class="result-emoji" id="resultEmoji" aria-hidden="true">🌍</div>
+        <h2 id="resultTitle">Your Annual Carbon Footprint</h2>
+        <div class="result-total" id="resultTotal" aria-label="Total carbon footprint"></div>
+        <div class="result-comparison" id="resultComparison"></div>
+      </div>
+      <div class="result-breakdown" role="list" aria-label="Footprint breakdown by category">
+        <div class="breakdown-item" role="listitem"><span aria-hidden="true">🚗</span><div class="breakdown-info"><div class="breakdown-label">Transport</div><div class="breakdown-bar-wrap"><div class="breakdown-bar" id="transportBar" role="progressbar" aria-label="Transport emissions"></div></div></div><div class="breakdown-val" id="transportVal"></div></div>
+        <div class="breakdown-item" role="listitem"><span aria-hidden="true">🍽️</span><div class="breakdown-info"><div class="breakdown-label">Food</div><div class="breakdown-bar-wrap"><div class="breakdown-bar" id="foodBar" role="progressbar" aria-label="Food emissions"></div></div></div><div class="breakdown-val" id="foodVal"></div></div>
+        <div class="breakdown-item" role="listitem"><span aria-hidden="true">⚡</span><div class="breakdown-info"><div class="breakdown-label">Energy</div><div class="breakdown-bar-wrap"><div class="breakdown-bar" id="energyBar" role="progressbar" aria-label="Energy emissions"></div></div></div><div class="breakdown-val" id="energyVal"></div></div>
+        <div class="breakdown-item" role="listitem"><span aria-hidden="true">🛍️</span><div class="breakdown-info"><div class="breakdown-label">Shopping</div><div class="breakdown-bar-wrap"><div class="breakdown-bar" id="shoppingBar" role="progressbar" aria-label="Shopping emissions"></div></div></div><div class="breakdown-val" id="shoppingVal"></div></div>
+      </div>
+      <div class="result-chart-wrap">
+        <canvas id="resultChart" aria-label="Footprint breakdown pie chart"></canvas>
+      </div>
+      <div class="ai-tips" id="aiTips" aria-live="polite" aria-label="AI personalized tips">
+        <div class="ai-tips-header"><span aria-hidden="true">🤖</span><h3>Your Personalized AI Tips</h3></div>
+        <div class="ai-tips-loading" id="aiTipsLoading"><div class="loading-spinner" role="status" aria-label="Loading AI tips"></div><p>EcoAI is analyzing your footprint...</p></div>
+        <div class="ai-tips-content hidden" id="aiTipsContent"></div>
+      </div>
+      <div class="result-actions">
+        <a href="tracker.html" class="btn btn-primary" aria-label="Start tracking your eco actions">Start Tracking Actions</a>
+        <button class="btn btn-ghost" onclick="resetCalculator()" aria-label="Recalculate your footprint">Recalculate</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="chatbot-overlay" id="chatOverlay" onclick="toggleChat()" aria-hidden="true"></div>
+  <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="EcoAI Chat">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-avatar" aria-hidden="true">🌱</div>
+        <div>
+          <div class="chat-name">EcoAI</div>
+          <div class="chat-status"><span class="status-dot" aria-hidden="true"></span> Powered by Groq</div>
+        </div>
+      </div>
+      <button class="chat-close" onclick="toggleChat()" aria-label="Close chat">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
+      <div class="chat-bubble ai">
+        <div class="bubble-avatar" aria-hidden="true">🌱</div>
+        <div class="bubble-content"><p>Ask me anything about your carbon footprint!</p></div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <div class="chat-input-wrapper">
+        <label for="chatInput" class="sr-only">Type your message</label>
+        <textarea id="chatInput" placeholder="Ask about your results..." rows="1" onkeydown="handleChatKey(event)" oninput="autoResize(this)" aria-label="Chat message"></textarea>
+        <button class="send-btn" onclick="sendMessage()" id="sendBtn" aria-label="Send message">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="chat-footer-note">Powered by Groq</div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/calculator.js"></script>
+  <script type="module" src="../js/chatbot.js"></script>
+</body>
+</html>

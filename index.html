@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#22c55e"/>
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="EcoIQ — Your Carbon Footprint AI"/>
+  <meta property="og:description" content="Track and reduce your carbon footprint with AI-powered insights. Calculate, track and reduce your environmental impact."/>
+  <meta name="description" content="EcoIQ - Track and reduce your carbon footprint with AI-powered insights"/>
+  <title>EcoIQ — Your Carbon Footprint AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <a class="nav-logo" href="index.html" aria-label="EcoIQ home">
+      <span class="logo-icon" aria-hidden="true">🌱</span>
+      <span class="logo-text">EcoIQ</span>
+    </a>
+    <ul class="nav-links" role="menubar">
+      <li role="none"><a href="index.html" class="active" role="menuitem">Home</a></li>
+      <li role="none"><a href="pages/calculator.html" role="menuitem">Calculator</a></li>
+      <li role="none"><a href="pages/tracker.html" role="menuitem">Tracker</a></li>
+      <li role="none"><a href="pages/insights.html" role="menuitem">Insights</a></li>
+      <li role="none"><a href="pages/quiz.html" role="menuitem">Quiz</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="chat-toggle-btn" onclick="toggleChat()" aria-label="Open AI chat assistant" aria-expanded="false" id="chatToggleBtn">
+        <span aria-hidden="true">🤖</span> Ask EcoAI
+      </button>
+      <button class="login-btn" id="loginBtn" aria-label="Sign in with Google">Sign In</button>
+      <div class="user-info hidden" id="userInfo">
+        <img src="" alt="Profile picture" class="user-avatar" id="userAvatar"/>
+        <span id="userName"></span>
+        <button onclick="handleLogout()" aria-label="Sign out">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero" id="main-content" aria-labelledby="heroTitle">
+    <div class="hero-badge" role="status">🌍 AI-Powered Carbon Tracking</div>
+    <h1 class="hero-title" id="heroTitle">
+      <span class="title-line">Know Your</span>
+      <span class="title-line accent">Carbon Impact.</span>
+      <span class="title-line">Act on It.</span>
+    </h1>
+    <p class="hero-subtitle">
+      EcoIQ uses AI to help you understand, track, and reduce your personal carbon footprint — one simple action at a time.
+    </p>
+    <div class="hero-cta">
+      <a href="pages/calculator.html" class="btn btn-primary" aria-label="Calculate your carbon footprint">Calculate My Footprint</a>
+      <a href="pages/tracker.html" class="btn btn-ghost" aria-label="Track your daily eco actions">Track Actions →</a>
+    </div>
+    <div class="hero-stats" role="region" aria-label="App statistics">
+      <div class="stat">
+        <span class="stat-num" aria-label="4 tracking categories">4</span>
+        <span class="stat-label">Categories</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" aria-label="AI powered">AI</span>
+        <span class="stat-label">Powered</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" aria-label="50 plus eco actions">50+</span>
+        <span class="stat-label">Eco Actions</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="features" aria-labelledby="featuresTitle">
+    <div class="section-label">What You Can Do</div>
+    <h2 class="section-title" id="featuresTitle">Everything You Need<br/>To Go Green</h2>
+    <div class="cards-grid">
+      <a href="pages/calculator.html" class="feature-card" data-color="green" aria-label="Carbon Calculator - Calculate your footprint">
+        <div class="card-icon" aria-hidden="true">🧮</div>
+        <h3>Carbon Calculator</h3>
+        <p>Calculate your footprint from transport, food, energy and shopping in minutes.</p>
+        <span class="card-arrow" aria-hidden="true">→</span>
+      </a>
+      <a href="pages/tracker.html" class="feature-card" data-color="blue" aria-label="Action Tracker - Track daily eco actions">
+        <div class="card-icon" aria-hidden="true">✅</div>
+        <h3>Action Tracker</h3>
+        <p>Log daily eco-friendly actions, build streaks and earn points for going green.</p>
+        <span class="card-arrow" aria-hidden="true">→</span>
+      </a>
+      <a href="pages/insights.html" class="feature-card" data-color="purple" aria-label="Insights - View your progress charts">
+        <div class="card-icon" aria-hidden="true">📊</div>
+        <h3>Insights</h3>
+        <p>Visual charts showing your carbon reduction progress over time.</p>
+        <span class="card-arrow" aria-hidden="true">→</span>
+      </a>
+      <a href="pages/quiz.html" class="feature-card" data-color="orange" aria-label="Quiz - Test your eco knowledge">
+        <div class="card-icon" aria-hidden="true">🧠</div>
+        <h3>Eco Quiz</h3>
+        <p>Test your environmental knowledge with our timed quiz and learn new facts.</p>
+        <span class="card-arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="carbon-meter-section" aria-labelledby="meterTitle">
+    <div class="section-label">Quick Check</div>
+    <h2 class="section-title" id="meterTitle">What's Your Daily Impact?</h2>
+    <div class="meter-grid">
+      <div class="meter-card">
+        <div class="meter-icon" aria-hidden="true">🚗</div>
+        <h4>Transport</h4>
+        <p>Average car emits <strong>4.6 tonnes</strong> CO₂/year</p>
+        <div class="meter-bar" role="progressbar" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100" aria-label="Transport emissions 72%">
+          <div class="meter-fill red" style="width:72%"></div>
+        </div>
+      </div>
+      <div class="meter-card">
+        <div class="meter-icon" aria-hidden="true">🍽️</div>
+        <h4>Food</h4>
+        <p>Diet accounts for <strong>25%</strong> of emissions</p>
+        <div class="meter-bar" role="progressbar" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100" aria-label="Food emissions 55%">
+          <div class="meter-fill orange" style="width:55%"></div>
+        </div>
+      </div>
+      <div class="meter-card">
+        <div class="meter-icon" aria-hidden="true">⚡</div>
+        <h4>Energy</h4>
+        <p>Home energy uses <strong>2.5 tonnes</strong> CO₂/year</p>
+        <div class="meter-bar" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" aria-label="Energy emissions 45%">
+          <div class="meter-fill yellow" style="width:45%"></div>
+        </div>
+      </div>
+      <div class="meter-card">
+        <div class="meter-icon" aria-hidden="true">🛍️</div>
+        <h4>Shopping</h4>
+        <p>Consumer goods emit <strong>1.9 tonnes</strong> CO₂/year</p>
+        <div class="meter-bar" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" aria-label="Shopping emissions 30%">
+          <div class="meter-fill green" style="width:30%"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="chatbot-overlay" id="chatOverlay" onclick="toggleChat()" aria-hidden="true"></div>
+  <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="EcoAI Chat Assistant">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-avatar" aria-hidden="true">🌱</div>
+        <div>
+          <div class="chat-name">EcoAI</div>
+          <div class="chat-status"><span class="status-dot" aria-hidden="true"></span> Powered by Groq</div>
+        </div>
+      </div>
+      <button class="chat-close" onclick="toggleChat()" aria-label="Close chat">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-label="Chat messages">
+      <div class="chat-bubble ai">
+        <div class="bubble-avatar" aria-hidden="true">🌱</div>
+        <div class="bubble-content">
+          <p>Hi! I'm <strong>EcoAI</strong> — your personal carbon footprint assistant powered by Groq.</p>
+          <p>Ask me anything about reducing your carbon footprint, eco-friendly habits, or climate change!</p>
+        </div>
+      </div>
+      <div class="chat-suggestions" role="group" aria-label="Suggested questions">
+        <button onclick="sendSuggestion('How can I reduce my carbon footprint today?')">Reduce my footprint</button>
+        <button onclick="sendSuggestion('What foods have the lowest carbon footprint?')">Low carbon foods</button>
+        <button onclick="sendSuggestion('How much CO2 does flying produce?')">Flying emissions</button>
+        <button onclick="sendSuggestion('Simple eco actions for beginners')">Beginner tips</button>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <div class="chat-input-wrapper">
+        <label for="chatInput" class="sr-only">Type your message</label>
+        <textarea id="chatInput" placeholder="Ask about carbon footprint, eco tips..." rows="1"
+          onkeydown="handleChatKey(event)" oninput="autoResize(this)" aria-label="Chat message input"></textarea>
+        <button class="send-btn" onclick="sendMessage()" id="sendBtn" aria-label="Send message">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="chat-footer-note" aria-label="Powered by Groq">Powered by Groq</div>
+    </div>
+  </div>
+
+  <footer class="footer" role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span aria-hidden="true">🌱</span>
+        <span class="logo-text">EcoIQ</span>
+        <p>Making sustainability accessible for everyone.</p>
+      </div>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="pages/calculator.html">Calculator</a>
+        <a href="pages/tracker.html">Tracker</a>
+        <a href="pages/insights.html">Insights</a>
+        <a href="pages/quiz.html">Quiz</a>
+      </nav>
+      <div class="footer-note">Built for Google Prompt War 2026 · Challenge 3</div>
+    </div>
+  </footer>
+
+  <script type="module" src="main.js"></script>
+  <script type="module" src="js/chatbot.js"></script>
+</body>
+</html>

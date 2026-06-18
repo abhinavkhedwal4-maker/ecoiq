@@ -1,0 +1,12 @@
+{
+  "name": "ecoiq",
+  "version": "1.0.0",
+  "description": "AI Carbon Footprint Tracker - Google Prompt War 2026",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tests/app.test.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
+}

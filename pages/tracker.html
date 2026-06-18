@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#22c55e"/>
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="EcoIQ — Your Carbon Footprint AI"/>
+  <meta property="og:description" content="Track and reduce your carbon footprint with AI-powered insights. Calculate, track and reduce your environmental impact."/>
+  <meta name="description" content="Track your daily eco-friendly actions and build green habits"/>
+  <title>Action Tracker — EcoIQ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css"/>
+  <link rel="stylesheet" href="../css/tracker.css"/>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <a class="nav-logo" href="../index.html" aria-label="EcoIQ home">
+      <span class="logo-icon" aria-hidden="true">🌱</span>
+      <span class="logo-text">EcoIQ</span>
+    </a>
+    <ul class="nav-links" role="menubar">
+      <li role="none"><a href="../index.html" role="menuitem">Home</a></li>
+      <li role="none"><a href="calculator.html" role="menuitem">Calculator</a></li>
+      <li role="none"><a href="tracker.html" class="active" role="menuitem">Tracker</a></li>
+      <li role="none"><a href="insights.html" role="menuitem">Insights</a></li>
+      <li role="none"><a href="quiz.html" role="menuitem">Quiz</a></li>
+    </ul>
+    <button class="chat-toggle-btn" onclick="toggleChat()" aria-label="Open AI assistant" aria-expanded="false" id="chatToggleBtn">
+      🤖 Ask EcoAI
+    </button>
+  </nav>
+
+  <div class="page-hero" id="main-content">
+    <div class="section-label">Build Green Habits</div>
+    <h1>Daily Action <span style="color:var(--green)">Tracker</span></h1>
+    <p>Log eco-friendly actions every day, build streaks, earn points and watch your impact grow.</p>
+  </div>
+
+  <div class="page-content">
+    <div class="tracker-stats" role="region" aria-label="Your tracking statistics">
+      <div class="tracker-stat-card">
+        <div class="tsc-icon" aria-hidden="true">🔥</div>
+        <div class="tsc-info"><div class="tsc-num" id="streakCount" aria-live="polite">0</div><div class="tsc-label">Day Streak</div></div>
+      </div>
+      <div class="tracker-stat-card">
+        <div class="tsc-icon" aria-hidden="true">⭐</div>
+        <div class="tsc-info"><div class="tsc-num" id="totalPoints" aria-live="polite">0</div><div class="tsc-label">Eco Points</div></div>
+      </div>
+      <div class="tracker-stat-card">
+        <div class="tsc-icon" aria-hidden="true">✅</div>
+        <div class="tsc-info"><div class="tsc-num" id="totalActions" aria-live="polite">0</div><div class="tsc-label">Actions Logged</div></div>
+      </div>
+      <div class="tracker-stat-card">
+        <div class="tsc-icon" aria-hidden="true">💨</div>
+        <div class="tsc-info"><div class="tsc-num" id="co2Saved" aria-live="polite">0 kg</div><div class="tsc-label">CO₂ Saved</div></div>
+      </div>
+    </div>
+
+    <div class="tracker-section" role="region" aria-labelledby="todayTitle">
+      <div class="tracker-section-header">
+        <h2 id="todayTitle">Today's Actions</h2>
+        <div class="today-date" id="todayDate" aria-label="Today's date"></div>
+      </div>
+      <div class="category-filter" role="group" aria-label="Filter actions by category">
+        <button class="cat-btn active" data-cat="all" aria-pressed="true">All</button>
+        <button class="cat-btn" data-cat="transport" aria-pressed="false">🚗 Transport</button>
+        <button class="cat-btn" data-cat="food" aria-pressed="false">🍽️ Food</button>
+        <button class="cat-btn" data-cat="energy" aria-pressed="false">⚡ Energy</button>
+        <button class="cat-btn" data-cat="shopping" aria-pressed="false">🛍️ Shopping</button>
+        <button class="cat-btn" data-cat="nature" aria-pressed="false">🌿 Nature</button>
+      </div>
+      <div class="actions-grid" id="actionsGrid" role="list" aria-label="Available eco actions"></div>
+    </div>
+
+    <div class="tracker-section" role="region" aria-labelledby="historyTitle">
+      <h2 id="historyTitle">Recent Activity</h2>
+      <div class="history-list" id="historyList" role="list" aria-label="Recent logged actions">
+        <div class="history-empty" id="historyEmpty" role="status">No actions logged yet. Start tracking above! 🌱</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chatbot-overlay" id="chatOverlay" onclick="toggleChat()" aria-hidden="true"></div>
+  <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="EcoAI Chat">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-avatar" aria-hidden="true">🌱</div>
+        <div>
+          <div class="chat-name">EcoAI</div>
+          <div class="chat-status"><span class="status-dot" aria-hidden="true"></span> Powered by Groq</div>
+        </div>
+      </div>
+      <button class="chat-close" onclick="toggleChat()" aria-label="Close chat">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
+      <div class="chat-bubble ai">
+        <div class="bubble-avatar" aria-hidden="true">🌱</div>
+        <div class="bubble-content"><p>Great job tracking your actions! Ask me for more eco tips.</p></div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <div class="chat-input-wrapper">
+        <label for="chatInput" class="sr-only">Type your message</label>
+        <textarea id="chatInput" placeholder="Ask for eco tips..." rows="1" onkeydown="handleChatKey(event)" oninput="autoResize(this)" aria-label="Chat message"></textarea>
+        <button class="send-btn" onclick="sendMessage()" id="sendBtn" aria-label="Send message">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="chat-footer-note">Powered by Groq</div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/tracker.js"></script>
+  <script type="module" src="../js/chatbot.js"></script>
+</body>
+</html>

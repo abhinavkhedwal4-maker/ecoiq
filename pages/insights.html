@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#22c55e"/>
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="EcoIQ — Your Carbon Footprint AI"/>
+  <meta property="og:description" content="Track and reduce your carbon footprint with AI-powered insights. Calculate, track and reduce your environmental impact."/>
+  <meta name="description" content="View your carbon footprint progress and insights over time"/>
+  <title>Insights — EcoIQ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css"/>
+  <link rel="stylesheet" href="../css/insights.css"/>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <a class="nav-logo" href="../index.html" aria-label="EcoIQ home">
+      <span class="logo-icon" aria-hidden="true">🌱</span>
+      <span class="logo-text">EcoIQ</span>
+    </a>
+    <ul class="nav-links" role="menubar">
+      <li role="none"><a href="../index.html" role="menuitem">Home</a></li>
+      <li role="none"><a href="calculator.html" role="menuitem">Calculator</a></li>
+      <li role="none"><a href="tracker.html" role="menuitem">Tracker</a></li>
+      <li role="none"><a href="insights.html" class="active" role="menuitem">Insights</a></li>
+      <li role="none"><a href="quiz.html" role="menuitem">Quiz</a></li>
+    </ul>
+    <button class="chat-toggle-btn" onclick="toggleChat()" aria-label="Open AI assistant" aria-expanded="false" id="chatToggleBtn">
+      🤖 Ask EcoAI
+    </button>
+  </nav>
+
+  <div class="page-hero" id="main-content">
+    <div class="section-label">Your Progress</div>
+    <h1>Carbon <span style="color:var(--green)">Insights</span></h1>
+    <p>Track your reduction journey with visual charts and AI-powered analysis of your progress.</p>
+  </div>
+
+  <div class="page-content">
+    <div class="insights-summary" role="region" aria-label="Summary statistics">
+      <div class="summary-card"><div class="summary-icon" aria-hidden="true">📉</div><div class="summary-info"><div class="summary-num" id="totalReduced" aria-live="polite">0 kg</div><div class="summary-label">Total CO₂ Reduced</div></div></div>
+      <div class="summary-card"><div class="summary-icon" aria-hidden="true">🏆</div><div class="summary-info"><div class="summary-num" id="bestCategory" aria-live="polite">—</div><div class="summary-label">Best Category</div></div></div>
+      <div class="summary-card"><div class="summary-icon" aria-hidden="true">📅</div><div class="summary-info"><div class="summary-num" id="activeDays" aria-live="polite">0</div><div class="summary-label">Active Days</div></div></div>
+      <div class="summary-card"><div class="summary-icon" aria-hidden="true">⭐</div><div class="summary-info"><div class="summary-num" id="ecoLevel" aria-live="polite">Seedling</div><div class="summary-label">Eco Level</div></div></div>
+    </div>
+
+    <div style="text-align:right;margin-bottom:1.5rem;">
+      <button id="refreshBtn" class="btn btn-ghost" style="font-size:0.85rem;" aria-label="Refresh insights data">🔄 Refresh Data</button>
+    </div>
+
+    <div class="insights-section" role="region" aria-labelledby="donutTitle">
+      <h2 id="donutTitle">CO₂ Saved by Category</h2>
+      <div class="chart-wrap"><canvas id="donutChart" aria-label="Carbon footprint donut chart" role="img"></canvas></div>
+    </div>
+
+    <div class="insights-section" role="region" aria-labelledby="lineTitle">
+      <h2 id="lineTitle">Points Over Time</h2>
+      <div class="chart-wrap"><canvas id="lineChart" aria-label="Points over time line chart" role="img"></canvas></div>
+    </div>
+
+    <div class="insights-section" role="region" aria-labelledby="breakdownTitle">
+      <h2 id="breakdownTitle">Actions by Category</h2>
+      <div class="category-bars" id="categoryBars" aria-label="Category breakdown"></div>
+    </div>
+
+    <div class="insights-section" role="region" aria-labelledby="weeklyTitle">
+      <h2 id="weeklyTitle">This Week's Activity</h2>
+      <div class="weekly-chart" id="weeklyChart" aria-label="Weekly activity chart"></div>
+    </div>
+
+    <div class="insights-section ai-analysis" role="region" aria-labelledby="aiTitle">
+      <div class="ai-analysis-header"><span aria-hidden="true">🤖</span><h2 id="aiTitle">AI Progress Analysis</h2></div>
+      <div id="aiAnalysis" aria-live="polite">
+        <div class="analysis-loading"><div class="loading-spinner" role="status" aria-label="Loading"></div><p>EcoAI is analyzing your progress...</p></div>
+      </div>
+    </div>
+
+    <div class="insights-section" role="region" aria-labelledby="levelTitle">
+      <h2 id="levelTitle">Your Eco Journey</h2>
+      <div class="level-track" role="list" aria-label="Eco level progression">
+        <div class="level-item" role="listitem" data-points="0"><div class="level-icon" aria-hidden="true">🌱</div><div class="level-name">Seedling</div><div class="level-req">0 pts</div></div>
+        <div class="level-item" role="listitem" data-points="100"><div class="level-icon" aria-hidden="true">🌿</div><div class="level-name">Sprout</div><div class="level-req">100 pts</div></div>
+        <div class="level-item" role="listitem" data-points="300"><div class="level-icon" aria-hidden="true">🌳</div><div class="level-name">Sapling</div><div class="level-req">300 pts</div></div>
+        <div class="level-item" role="listitem" data-points="600"><div class="level-icon" aria-hidden="true">🌲</div><div class="level-name">Tree</div><div class="level-req">600 pts</div></div>
+        <div class="level-item" role="listitem" data-points="1000"><div class="level-icon" aria-hidden="true">🌍</div><div class="level-name">Guardian</div><div class="level-req">1000 pts</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chatbot-overlay" id="chatOverlay" onclick="toggleChat()" aria-hidden="true"></div>
+  <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="EcoAI Chat">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-avatar" aria-hidden="true">🌱</div>
+        <div>
+          <div class="chat-name">EcoAI</div>
+          <div class="chat-status"><span class="status-dot" aria-hidden="true"></span> Powered by Groq</div>
+        </div>
+      </div>
+      <button class="chat-close" onclick="toggleChat()" aria-label="Close chat">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
+      <div class="chat-bubble ai">
+        <div class="bubble-avatar" aria-hidden="true">🌱</div>
+        <div class="bubble-content"><p>Ask me to analyze your progress or suggest next steps!</p></div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <div class="chat-input-wrapper">
+        <label for="chatInput" class="sr-only">Type your message</label>
+        <textarea id="chatInput" placeholder="Ask about your progress..." rows="1" onkeydown="handleChatKey(event)" oninput="autoResize(this)" aria-label="Chat message"></textarea>
+        <button class="send-btn" onclick="sendMessage()" id="sendBtn" aria-label="Send message">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="chat-footer-note">Powered by Groq</div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script type="module" src="../js/insights.js"></script>
+  <script type="module" src="../js/chatbot.js"></script>
+</body>
+</html>
