@@ -14,13 +14,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../style.css"/>
   <link rel="stylesheet" href="../css/tracker.css"/>
-  <script type="module" src="../js/shared.js"></script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to main content</a>
-
   <canvas id="particleCanvas" aria-hidden="true"></canvas>
-
   <nav class="navbar" role="navigation" aria-label="Main navigation">
     <a class="nav-logo" href="../index.html" aria-label="EcoIQ home">
       <span class="logo-icon" aria-hidden="true">🌱</span>
@@ -37,13 +34,11 @@
       🤖 Ask EcoAI
     </button>
   </nav>
-
   <div class="page-hero" id="main-content">
     <div class="section-label">Build Green Habits</div>
     <h1>Daily Action <span style="color:var(--green)">Tracker</span></h1>
     <p>Log eco-friendly actions every day, build streaks, earn points and watch your impact grow.</p>
   </div>
-
   <div class="page-content">
     <div class="tracker-stats" role="region" aria-label="Your tracking statistics">
       <div class="tracker-stat-card">
@@ -63,7 +58,6 @@
         <div class="tsc-info"><div class="tsc-num" id="co2Saved" aria-live="polite">0 kg</div><div class="tsc-label">CO₂ Saved</div></div>
       </div>
     </div>
-
     <div class="tracker-section" role="region" aria-labelledby="todayTitle">
       <div class="tracker-section-header">
         <h2 id="todayTitle">Today's Actions</h2>
@@ -79,7 +73,6 @@
       </div>
       <div class="actions-grid" id="actionsGrid" role="list" aria-label="Available eco actions"></div>
     </div>
-
     <div class="tracker-section" role="region" aria-labelledby="historyTitle">
       <h2 id="historyTitle">Recent Activity</h2>
       <div class="history-list" id="historyList" role="list" aria-label="Recent logged actions">
@@ -87,7 +80,6 @@
       </div>
     </div>
   </div>
-
   <div class="chatbot-overlay" id="chatOverlay" onclick="toggleChat()" aria-hidden="true"></div>
   <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="EcoAI Chat">
     <div class="chat-header">
@@ -119,7 +111,7 @@
       <div class="chat-footer-note">Powered by Groq</div>
     </div>
   </div>
-
+  <script type="module" src="../js/shared.js"></script>
   <script type="module" src="../js/tracker.js"></script>
   <script type="module" src="../js/chatbot.js"></script>
 </body>

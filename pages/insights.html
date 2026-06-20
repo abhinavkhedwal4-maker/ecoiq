@@ -8,19 +8,16 @@
   <meta property="og:type" content="website"/>
   <meta property="og:title" content="EcoIQ — Your Carbon Footprint AI"/>
   <meta property="og:description" content="Track and reduce your carbon footprint with AI-powered insights. Calculate, track and reduce your environmental impact."/>
-  <meta name="description" content="View your carbon footprint progress and insights over time"/>
-  <title>Insights — EcoIQ</title>
+  <meta name="description" content="Test your environmental and climate change knowledge"/>
+  <title>Eco Quiz — EcoIQ</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../style.css"/>
-  <link rel="stylesheet" href="../css/insights.css"/>
-  <script type="module" src="../js/shared.js"></script>
+  <link rel="stylesheet" href="../css/quiz.css"/>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to main content</a>
-
   <canvas id="particleCanvas" aria-hidden="true"></canvas>
-
   <nav class="navbar" role="navigation" aria-label="Main navigation">
     <a class="nav-logo" href="../index.html" aria-label="EcoIQ home">
       <span class="logo-icon" aria-hidden="true">🌱</span>
@@ -30,71 +27,78 @@
       <li role="none"><a href="../index.html" role="menuitem">Home</a></li>
       <li role="none"><a href="calculator.html" role="menuitem">Calculator</a></li>
       <li role="none"><a href="tracker.html" role="menuitem">Tracker</a></li>
-      <li role="none"><a href="insights.html" class="active" role="menuitem">Insights</a></li>
-      <li role="none"><a href="quiz.html" role="menuitem">Quiz</a></li>
+      <li role="none"><a href="insights.html" role="menuitem">Insights</a></li>
+      <li role="none"><a href="quiz.html" class="active" role="menuitem">Quiz</a></li>
     </ul>
     <button class="chat-toggle-btn" onclick="toggleChat()" aria-label="Open AI assistant" aria-expanded="false" id="chatToggleBtn">
       🤖 Ask EcoAI
     </button>
   </nav>
-
-  <div class="page-hero" id="main-content">
-    <div class="section-label">Your Progress</div>
-    <h1>Carbon <span style="color:var(--green)">Insights</span></h1>
-    <p>Track your reduction journey with visual charts and AI-powered analysis of your progress.</p>
-  </div>
-
-  <div class="page-content">
-    <div class="insights-summary" role="region" aria-label="Summary statistics">
-      <div class="summary-card"><div class="summary-icon" aria-hidden="true">📉</div><div class="summary-info"><div class="summary-num" id="totalReduced" aria-live="polite">0 kg</div><div class="summary-label">Total CO₂ Reduced</div></div></div>
-      <div class="summary-card"><div class="summary-icon" aria-hidden="true">🏆</div><div class="summary-info"><div class="summary-num" id="bestCategory" aria-live="polite">—</div><div class="summary-label">Best Category</div></div></div>
-      <div class="summary-card"><div class="summary-icon" aria-hidden="true">📅</div><div class="summary-info"><div class="summary-num" id="activeDays" aria-live="polite">0</div><div class="summary-label">Active Days</div></div></div>
-      <div class="summary-card"><div class="summary-icon" aria-hidden="true">⭐</div><div class="summary-info"><div class="summary-num" id="ecoLevel" aria-live="polite">Seedling</div><div class="summary-label">Eco Level</div></div></div>
-    </div>
-
-    <div style="text-align:right;margin-bottom:1.5rem;">
-      <button id="refreshBtn" class="btn btn-ghost" style="font-size:0.85rem;" aria-label="Refresh insights data">🔄 Refresh Data</button>
-    </div>
-
-    <div class="insights-section" role="region" aria-labelledby="donutTitle">
-      <h2 id="donutTitle">CO₂ Saved by Category</h2>
-      <div class="chart-wrap"><canvas id="donutChart" aria-label="Carbon footprint donut chart" role="img"></canvas></div>
-    </div>
-
-    <div class="insights-section" role="region" aria-labelledby="lineTitle">
-      <h2 id="lineTitle">Points Over Time</h2>
-      <div class="chart-wrap"><canvas id="lineChart" aria-label="Points over time line chart" role="img"></canvas></div>
-    </div>
-
-    <div class="insights-section" role="region" aria-labelledby="breakdownTitle">
-      <h2 id="breakdownTitle">Actions by Category</h2>
-      <div class="category-bars" id="categoryBars" aria-label="Category breakdown"></div>
-    </div>
-
-    <div class="insights-section" role="region" aria-labelledby="weeklyTitle">
-      <h2 id="weeklyTitle">This Week's Activity</h2>
-      <div class="weekly-chart" id="weeklyChart" aria-label="Weekly activity chart"></div>
-    </div>
-
-    <div class="insights-section ai-analysis" role="region" aria-labelledby="aiTitle">
-      <div class="ai-analysis-header"><span aria-hidden="true">🤖</span><h2 id="aiTitle">AI Progress Analysis</h2></div>
-      <div id="aiAnalysis" aria-live="polite">
-        <div class="analysis-loading"><div class="loading-spinner" role="status" aria-label="Loading"></div><p>EcoAI is analyzing your progress...</p></div>
+  <!-- ✅ FIXED: was <div id="quizStart" ... id="main-content"> (duplicate id) -->
+  <div id="main-content" class="quiz-screen">
+    <div class="quiz-start-inner">
+      <div class="quiz-badge">🧠 Eco Knowledge Test</div>
+      <h1 class="quiz-title">How Green<br/><em>Are You?</em></h1>
+      <p class="quiz-desc">Test your knowledge of climate change, carbon footprints and sustainable living. 15 questions · Timed · Scored</p>
+      <div class="quiz-info-row" role="list" aria-label="Quiz details">
+        <div class="quiz-info-item" role="listitem"><span aria-hidden="true">📝</span><span>15 Questions</span></div>
+        <div class="quiz-info-item" role="listitem"><span aria-hidden="true">⏱️</span><span>20 Seconds Each</span></div>
+        <div class="quiz-info-item" role="listitem"><span aria-hidden="true">🏆</span><span>Eco Grade</span></div>
       </div>
+      <div class="difficulty-select">
+        <div class="diff-label" id="diffLabel">Select Difficulty:</div>
+        <div class="diff-btns" role="radiogroup" aria-labelledby="diffLabel">
+          <button class="diff-btn active" data-diff="easy" role="radio" aria-checked="true">Beginner</button>
+          <button class="diff-btn" data-diff="medium" role="radio" aria-checked="false">Intermediate</button>
+          <button class="diff-btn" data-diff="hard" role="radio" aria-checked="false">Expert</button>
+        </div>
+      </div>
+      <button class="btn btn-primary quiz-start-btn" onclick="startQuiz()" aria-label="Start the eco quiz">Start Quiz →</button>
     </div>
-
-    <div class="insights-section" role="region" aria-labelledby="levelTitle">
-      <h2 id="levelTitle">Your Eco Journey</h2>
-      <div class="level-track" role="list" aria-label="Eco level progression">
-        <div class="level-item" role="listitem" data-points="0"><div class="level-icon" aria-hidden="true">🌱</div><div class="level-name">Seedling</div><div class="level-req">0 pts</div></div>
-        <div class="level-item" role="listitem" data-points="100"><div class="level-icon" aria-hidden="true">🌿</div><div class="level-name">Sprout</div><div class="level-req">100 pts</div></div>
-        <div class="level-item" role="listitem" data-points="300"><div class="level-icon" aria-hidden="true">🌳</div><div class="level-name">Sapling</div><div class="level-req">300 pts</div></div>
-        <div class="level-item" role="listitem" data-points="600"><div class="level-icon" aria-hidden="true">🌲</div><div class="level-name">Tree</div><div class="level-req">600 pts</div></div>
-        <div class="level-item" role="listitem" data-points="1000"><div class="level-icon" aria-hidden="true">🌍</div><div class="level-name">Guardian</div><div class="level-req">1000 pts</div></div>
+  </div>
+  <div id="quizActive" class="quiz-screen hidden" role="main" aria-label="Quiz in progress">
+    <div class="quiz-active-inner">
+      <div class="quiz-top-bar">
+        <div class="quiz-progress-text" id="progressText" aria-live="polite">Question 1 of 15</div>
+        <div class="quiz-score-display" aria-live="polite">Score: <span id="liveScore">0</span></div>
+        <div class="quiz-timer" id="quizTimer" role="timer" aria-live="assertive" aria-label="Time remaining">20</div>
+      </div>
+      <div class="quiz-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0" id="quizProgressBar">
+        <div class="quiz-progress-fill" id="progressFill"></div>
+      </div>
+      <div class="question-card" id="questionCard">
+        <div class="q-category" id="qCategory" aria-label="Question category"></div>
+        <h2 class="q-text" id="qText" aria-live="polite"></h2>
+        <div class="options-grid" id="optionsGrid" role="group" aria-label="Answer options"></div>
+      </div>
+      <div class="quiz-nav">
+        <button class="quiz-skip-btn" onclick="skipQuestion()" aria-label="Skip this question">Skip →</button>
       </div>
     </div>
   </div>
-
+  <div id="quizResult" class="quiz-screen hidden" role="main" aria-label="Quiz results">
+    <div class="quiz-result-inner">
+      <div class="result-emoji" id="resultEmoji" aria-hidden="true">🌍</div>
+      <h2 class="result-grade" id="resultGrade" aria-live="polite">Great Job!</h2>
+      <div class="result-score-ring" role="img" aria-labelledby="scoreLabel">
+        <svg viewBox="0 0 120 120" class="score-ring-svg" aria-hidden="true">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(34,197,94,0.15)" stroke-width="8"/>
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#22c55e" stroke-width="8" stroke-dasharray="314" stroke-dashoffset="314" stroke-linecap="round" id="scoreRingCircle" transform="rotate(-90 60 60)"/>
+        </svg>
+        <div class="score-ring-text">
+          <span class="score-num" id="finalScore" aria-label="Final score">0</span>
+          <span class="score-denom">/15</span>
+        </div>
+      </div>
+      <p id="scoreLabel" class="sr-only">Your score out of 15</p>
+      <p class="result-message" id="resultMessage"></p>
+      <div class="result-breakdown" id="resultBreakdown" role="list" aria-label="Score breakdown"></div>
+      <div class="result-actions">
+        <button class="btn btn-primary" onclick="restartQuiz()" aria-label="Play quiz again">Play Again</button>
+        <a href="tracker.html" class="btn btn-ghost" aria-label="Go to action tracker">Track Actions →</a>
+      </div>
+    </div>
+  </div>
   <div class="chatbot-overlay" id="chatOverlay" onclick="toggleChat()" aria-hidden="true"></div>
   <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="EcoAI Chat">
     <div class="chat-header">
@@ -110,13 +114,13 @@
     <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
       <div class="chat-bubble ai">
         <div class="bubble-avatar" aria-hidden="true">🌱</div>
-        <div class="bubble-content"><p>Ask me to analyze your progress or suggest next steps!</p></div>
+        <div class="bubble-content"><p>Stuck on a question? Ask me anything about climate and environment!</p></div>
       </div>
     </div>
     <div class="chat-input-area">
       <div class="chat-input-wrapper">
         <label for="chatInput" class="sr-only">Type your message</label>
-        <textarea id="chatInput" placeholder="Ask about your progress..." rows="1" onkeydown="handleChatKey(event)" oninput="autoResize(this)" aria-label="Chat message"></textarea>
+        <textarea id="chatInput" placeholder="Ask about eco topics..." rows="1" onkeydown="handleChatKey(event)" oninput="autoResize(this)" aria-label="Chat message"></textarea>
         <button class="send-btn" onclick="sendMessage()" id="sendBtn" aria-label="Send message">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -126,9 +130,8 @@
       <div class="chat-footer-note">Powered by Groq</div>
     </div>
   </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script type="module" src="../js/insights.js"></script>
+  <script type="module" src="../js/shared.js"></script>
+  <script type="module" src="../js/quiz.js"></script>
   <script type="module" src="../js/chatbot.js"></script>
 </body>
 </html>

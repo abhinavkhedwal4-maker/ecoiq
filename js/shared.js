@@ -78,8 +78,10 @@ export function getLevel(points) {
 }
 
 /**
- * Toggles the AI chatbot panel open/closed and manages ARIA state
+ * Toggles the AI chatbot panel open/closed and manages ARIA state.
  * Shared across all pages that include the chat panel markup.
+ *
+ * ✅ Uses 'active' class to match .chatbot-panel.active in style.css
  */
 export function toggleChat() {
   const panel   = document.getElementById('chatPanel');
@@ -87,16 +89,19 @@ export function toggleChat() {
   const btn     = document.getElementById('chatToggleBtn');
   if (!panel) return;
 
-  const isOpen = panel.classList.toggle('open');
+  const isOpen = panel.classList.toggle('active'); // ✅ was 'open' — fixed to 'active'
   overlay?.classList.toggle('active', isOpen);
+  overlay?.setAttribute('aria-hidden', String(!isOpen));
   btn?.setAttribute('aria-expanded', String(isOpen));
   document.body.style.overflow = isOpen ? 'hidden' : '';
+
+  if (isOpen) {
+    const input = panel.querySelector('#chatInput');
+    if (input) setTimeout(() => input.focus(), 50);
+  }
 }
 
-// Expose toggleChat globally since it's invoked from inline onclick="" in HTML
-// Only in browser environment (not Node.js for tests)
+// Expose globally for inline onclick="" handlers in HTML (ES modules are scoped)
 if (typeof window !== 'undefined') {
   window.toggleChat = toggleChat;
 }
-
-// Made with Bob

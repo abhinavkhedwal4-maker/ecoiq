@@ -227,13 +227,4 @@ window.restartQuiz = function() {
 };
 
 // ---- CHAT TOGGLE ----
-window.toggleChat = function() {
-  const panel   = document.getElementById('chatPanel');
-  const overlay = document.getElementById('chatOverlay');
-  const btn     = document.getElementById('chatToggleBtn');
-  if (!panel) {return;}
-  const isOpen = panel.classList.toggle('open');
-  overlay.classList.toggle('active', isOpen);
-  if (btn) {btn.setAttribute('aria-expanded', String(isOpen));}
-  document.body.style.overflow = isOpen ? 'hidden' : '';
-};
+// toggleChat is now provided by shared.js - no need to redefine it here

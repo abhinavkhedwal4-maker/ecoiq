@@ -15,13 +15,10 @@
   <link rel="stylesheet" href="../style.css"/>
   <link rel="stylesheet" href="../css/calculator.css"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-  <script type="module" src="../js/shared.js"></script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to main content</a>
-
   <canvas id="particleCanvas" aria-hidden="true"></canvas>
-
   <nav class="navbar" role="navigation" aria-label="Main navigation">
     <a class="nav-logo" href="../index.html" aria-label="EcoIQ home">
       <span class="logo-icon" aria-hidden="true">🌱</span>
@@ -38,13 +35,11 @@
       🤖 Ask EcoAI
     </button>
   </nav>
-
   <div class="page-hero" id="main-content">
     <div class="section-label">Step 1 of Your Green Journey</div>
     <h1>Carbon Footprint<br/><span style="color:var(--green)">Calculator</span></h1>
     <p>Answer a few simple questions to discover your annual carbon footprint and get personalized AI-powered tips.</p>
   </div>
-
   <div class="page-content">
     <div class="calc-progress" role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0" aria-label="Calculator progress">
       <div class="progress-steps">
@@ -57,7 +52,6 @@
         <div class="progress-bar-fill" id="progressFill" style="width:25%"></div>
       </div>
     </div>
-
     <div class="calc-step active" id="step1" role="region" aria-labelledby="step1Title">
       <h2 id="step1Title">🚗 Transport</h2>
       <p class="step-desc">How do you usually get around?</p>
@@ -89,7 +83,6 @@
       </div>
       <button class="btn btn-primary calc-next" onclick="nextStep(2)" aria-label="Continue to food section">Next: Food →</button>
     </div>
-
     <div class="calc-step" id="step2" role="region" aria-labelledby="step2Title">
       <h2 id="step2Title">🍽️ Food</h2>
       <p class="step-desc">Your diet has a big impact on your footprint.</p>
@@ -124,7 +117,6 @@
         <button class="btn btn-primary" onclick="nextStep(3)" aria-label="Continue to energy section">Next: Energy →</button>
       </div>
     </div>
-
     <div class="calc-step" id="step3" role="region" aria-labelledby="step3Title">
       <h2 id="step3Title">⚡ Energy</h2>
       <p class="step-desc">Your home energy use matters.</p>
@@ -153,7 +145,6 @@
         <button class="btn btn-primary" onclick="nextStep(4)" aria-label="Continue to shopping section">Next: Shopping →</button>
       </div>
     </div>
-
     <div class="calc-step" id="step4" role="region" aria-labelledby="step4Title">
       <h2 id="step4Title">🛍️ Shopping</h2>
       <p class="step-desc">Consumer goods have a hidden carbon cost.</p>
@@ -186,7 +177,6 @@
         <button class="btn btn-primary" onclick="calculateFootprint()" aria-label="Calculate my carbon footprint">🧮 Calculate My Footprint</button>
       </div>
     </div>
-
     <div class="calc-result hidden" id="calcResult" role="region" aria-labelledby="resultTitle" aria-live="polite">
       <div class="result-header">
         <div class="result-emoji" id="resultEmoji" aria-hidden="true">🌍</div>
@@ -214,7 +204,6 @@
       </div>
     </div>
   </div>
-
   <div class="chatbot-overlay" id="chatOverlay" onclick="toggleChat()" aria-hidden="true"></div>
   <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="EcoAI Chat">
     <div class="chat-header">
@@ -246,7 +235,7 @@
       <div class="chat-footer-note">Powered by Groq</div>
     </div>
   </div>
-
+  <script type="module" src="../js/shared.js"></script>
   <script type="module" src="../js/calculator.js"></script>
   <script type="module" src="../js/chatbot.js"></script>
 </body>
