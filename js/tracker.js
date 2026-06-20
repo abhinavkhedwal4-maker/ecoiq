@@ -8,6 +8,7 @@
 
 import { db, auth } from './firebase.js';
 import { initAuth } from './auth.js';
+import { getTodayKey } from './shared.js';
 import {
   doc, getDoc, setDoc, serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
@@ -101,11 +102,6 @@ function loadLocalData() {
   } catch (err) {
     console.error('LocalStorage error:', err);
   }
-}
-
-/** @returns {string} YYYY-MM-DD */
-function getTodayKey() {
-  return new Date().toISOString().split('T')[0];
 }
 
 function renderAll() {
@@ -293,15 +289,3 @@ document.querySelectorAll('.cat-btn').forEach(btn => {
     renderActions(currentCat);
   });
 });
-
-// ---- CHAT TOGGLE ----
-window.toggleChat = function() {
-  const panel   = document.getElementById('chatPanel');
-  const overlay = document.getElementById('chatOverlay');
-  const btn     = document.getElementById('chatToggleBtn');
-  if (!panel) return;
-  const isOpen = panel.classList.toggle('open');
-  overlay.classList.toggle('active', isOpen);
-  if (btn) btn.setAttribute('aria-expanded', String(isOpen));
-  document.body.style.overflow = isOpen ? 'hidden' : '';
-};

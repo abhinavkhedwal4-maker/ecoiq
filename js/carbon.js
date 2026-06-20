@@ -1,3 +1,10 @@
+/**
+ * @fileoverview Carbon calculations
+ * @module carbon
+ */
+
+'use strict';
+
 const CARBON_FACTORS = {
   petrol: 0.21,
   diesel: 0.17,
@@ -49,6 +56,15 @@ const REPAIR_BONUS = {
   never: 0.2,
 };
 
+/**
+ * Calculates annual transport CO2 emissions in tonnes
+ * @param {Object} answers - User's transport answers
+ * @param {string} answers.carType - Type of car (petrol, diesel, electric, none)
+ * @param {number} answers.carKm - Weekly kilometers driven
+ * @param {number} answers.flightsPerYear - Number of flights per year
+ * @param {string} answers.publicTransport - Whether user uses public transport (yes/no)
+ * @returns {number} Annual CO2 emissions in tonnes
+ */
 export function calcTransport(answers) {
   const factor = CARBON_FACTORS[answers.carType] ?? CARBON_FACTORS.petrol;
   const carCO2 = answers.carKm * 52 * factor / 1000;
@@ -57,6 +73,14 @@ export function calcTransport(answers) {
   return Math.max(0, (carCO2 + flightCO2) * ptReduction);
 }
 
+/**
+ * Calculates annual food CO2 emissions in tonnes
+ * @param {Object} answers - User's food answers
+ * @param {string} answers.diet - Diet type (vegan, vegetarian, mixed, meat_heavy)
+ * @param {string} answers.beefFreq - Beef consumption frequency (never, once, often, daily)
+ * @param {string} answers.foodWaste - Food waste level (low, medium, high)
+ * @returns {number} Annual CO2 emissions in tonnes
+ */
 export function calcFood(answers) {
   return (
     (DIET_BASE[answers.diet] ?? DIET_BASE.mixed) +
@@ -65,6 +89,14 @@ export function calcFood(answers) {
   );
 }
 
+/**
+ * Calculates annual energy CO2 emissions in tonnes
+ * @param {Object} answers - User's energy answers
+ * @param {number} answers.electricityBill - Monthly electricity bill in rupees
+ * @param {string} answers.renewable - Whether using renewable energy (yes/no)
+ * @param {string} answers.hvac - HVAC usage level (low, medium, high)
+ * @returns {number} Annual CO2 emissions in tonnes
+ */
 export function calcEnergy(answers) {
   const monthly = answers.electricityBill;
   const kwhEstimate = monthly / 8;
@@ -74,6 +106,14 @@ export function calcEnergy(answers) {
   return energyCO2 + (HVAC_EXTRA[answers.hvac] ?? 0.3);
 }
 
+/**
+ * Calculates annual shopping CO2 emissions in tonnes
+ * @param {Object} answers - User's shopping answers
+ * @param {string} answers.clothes - Clothes shopping frequency (rarely, monthly, weekly)
+ * @param {string} answers.electronics - Electronics purchase frequency (rarely, yearly, often)
+ * @param {string} answers.repair - Repair vs replace preference (always, sometimes, never)
+ * @returns {number} Annual CO2 emissions in tonnes
+ */
 export function calcShopping(answers) {
   return Math.max(0,
     (CLOTHES_SCORE[answers.clothes] ?? 0.8) +
@@ -82,6 +122,11 @@ export function calcShopping(answers) {
   );
 }
 
+/**
+ * Determines grade and comparison message based on total CO2 emissions
+ * @param {number} total - Total annual CO2 emissions in tonnes
+ * @returns {{emoji: string, comparison: string}} Grade emoji and comparison message
+ */
 export function getGrade(total) {
   if (total < 2) {
     return {
@@ -117,12 +162,4 @@ export function getGrade(total) {
   };
 }
 
-export function formatMessage(text) {
-  return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/\n/g, '<br>')
-    .replace(/^/, '<p>')
-    .replace(/$/, '</p>');
-}
+// Made with Bob

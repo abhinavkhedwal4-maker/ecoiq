@@ -8,6 +8,7 @@
 
 import { db, auth } from './firebase.js';
 import { initAuth } from './auth.js';
+import { getLevel } from './shared.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 /** @type {Array<Object>} */
@@ -114,18 +115,6 @@ function renderSummary() {
 /** @returns {number} */
 function getActiveDays() {
   return new Set(history.map(h => h.date)).size;
-}
-
-/**
- * @param {number} points
- * @returns {{name:string, icon:string}}
- */
-function getLevel(points) {
-  if (points >= 1000) return { name: 'Guardian', icon: '🌍' };
-  if (points >= 600)  return { name: 'Tree',     icon: '🌲' };
-  if (points >= 300)  return { name: 'Sapling',  icon: '🌳' };
-  if (points >= 100)  return { name: 'Sprout',   icon: '🌿' };
-  return { name: 'Seedling', icon: '🌱' };
 }
 
 /** Renders category bars */
@@ -515,15 +504,3 @@ function showRefreshToast() {
   toast.style.transform = 'translateX(-50%) translateY(0)';
   setTimeout(() => { toast.style.transform = 'translateX(-50%) translateY(80px)'; }, 2000);
 }
-
-// ---- CHAT TOGGLE ----
-window.toggleChat = function() {
-  const panel   = document.getElementById('chatPanel');
-  const overlay = document.getElementById('chatOverlay');
-  const btn     = document.getElementById('chatToggleBtn');
-  if (!panel) return;
-  const isOpen = panel.classList.toggle('open');
-  overlay.classList.toggle('active', isOpen);
-  if (btn) btn.setAttribute('aria-expanded', String(isOpen));
-  document.body.style.overflow = isOpen ? 'hidden' : '';
-};

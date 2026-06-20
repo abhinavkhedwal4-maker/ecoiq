@@ -3,15 +3,20 @@
  * @description Secure Node.js server with rate limiting, CSP headers,
  *              input validation and Groq API proxy
  * @version 2.0.0
+ *
+ * NOTE: Code duplication between server.js and api/chat.js is intentional.
+ * They use different module systems (CommonJS vs ES modules) and run in
+ * different environments (Node.js vs Vercel serverless). Sharing code would
+ * require a build pipeline. This architectural decision prioritizes simplicity
+ * and deployment flexibility over DRY principles.
  */
 
 'use strict';
 
-const http   = require('http');
-const fs     = require('fs');
-const path   = require('path');
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
 const crypto = require('crypto');
-
 require('dotenv').config();
 
 const PORT        = parseInt(process.env.PORT, 10) || 3000;
@@ -96,18 +101,18 @@ function sanitizeString(str) {
  * @returns {{valid:boolean, sanitized?:Array, error?:string}}
  */
 function validateMessages(messages) {
-  if (!Array.isArray(messages))       return { valid: false, error: 'messages must be an array' };
-  if (messages.length === 0)          return { valid: false, error: 'messages array is empty' };
-  if (messages.length > 50)          return { valid: false, error: 'too many messages' };
+  if (!Array.isArray(messages))       return { valid: false, error: 'Messages must be an array' };
+  if (messages.length === 0)          return { valid: false, error: 'Messages array is empty' };
+  if (messages.length > 50)          return { valid: false, error: 'Too many messages' };
 
   const validRoles = new Set(['user', 'assistant', 'system']);
   const sanitized  = [];
 
   for (const msg of messages) {
-    if (!msg || typeof msg !== 'object') return { valid: false, error: 'invalid message object' };
-    if (!validRoles.has(msg.role))       return { valid: false, error: `invalid role: ${msg.role}` };
-    if (typeof msg.content !== 'string') return { valid: false, error: 'content must be string' };
-    if (!msg.content.trim())             return { valid: false, error: 'content cannot be empty' };
+    if (!msg || typeof msg !== 'object') return { valid: false, error: 'Invalid message object' };
+    if (!validRoles.has(msg.role))       return { valid: false, error: `Invalid role: ${msg.role}` };
+    if (typeof msg.content !== 'string') return { valid: false, error: 'Content must be string' };
+    if (!msg.content.trim())             return { valid: false, error: 'Content cannot be empty' };
     sanitized.push({ role: msg.role, content: sanitizeString(msg.content) });
   }
 

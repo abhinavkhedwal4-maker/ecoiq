@@ -6,6 +6,8 @@
 
 'use strict';
 
+import { sanitizeString, formatMessage } from './shared.js';
+
 const ENDPOINT       = '/api/chat';
 const MAX_MSG_LENGTH = 500;
 const RATE_LIMIT     = 10;
@@ -49,23 +51,6 @@ function checkClientRateLimit() {
 }
 
 /**
- * Sanitizes user input
- * @param {string} input
- * @returns {string}
- */
-function sanitizeInput(input) {
-  if (typeof input !== 'string') return '';
-  return input
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .trim()
-    .slice(0, MAX_MSG_LENGTH);
-}
-
-/**
  * Validates message before sending
  * @param {string} message
  * @returns {{valid:boolean, error?:string}}
@@ -75,23 +60,6 @@ function validateMessage(message) {
   if (message.trim().length === 0)             return { valid: false, error: 'Message cannot be empty.' };
   if (message.length > MAX_MSG_LENGTH)         return { valid: false, error: `Maximum ${MAX_MSG_LENGTH} characters.` };
   return { valid: true };
-}
-
-/**
- * Formats message text with markdown-lite
- * @param {string} text
- * @returns {string}
- */
-function formatMessage(text) {
-  if (typeof text !== 'string') return '';
-  return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g,     '<em>$1</em>')
-    .replace(/`(.*?)`/g,       (_, c) => `<code style="background:rgba(34,197,94,0.15);padding:0.1em 0.4em;border-radius:4px;font-family:monospace;">${sanitizeInput(c)}</code>`)
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/\n/g,   '<br>')
-    .replace(/^/,     '<p>')
-    .replace(/$/,     '</p>');
 }
 
 /**
@@ -214,7 +182,7 @@ async function sendMessage() {
     return;
   }
 
-  const message = sanitizeInput(rawText);
+  const message = sanitizeString(rawText.trim(), MAX_MSG_LENGTH);
   isProcessing  = true;
 
   appendMessage('user', rawText.trim());
@@ -294,3 +262,5 @@ window.clearChat = function() {
     </div>`;
   announceToScreenReader('Chat cleared.');
 };
+
+// Made with Bob
