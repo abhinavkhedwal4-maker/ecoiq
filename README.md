@@ -4,10 +4,7 @@
 > A web app that helps individuals **understand, track, and reduce** their personal carbon footprint through personalized AI insights, gamified action tracking, and interactive data visualizations.
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://ecoiq.vercel.app)
-[![CI](https://github.com/your-username/ecoiq/actions/workflows/ci.yml/badge.svg)](https://github.com/your-username/ecoiq/actions)
-[![Tests](https://img.shields.io/badge/Tests-85%20passing-brightgreen)]()
-[![Security](https://img.shields.io/badge/Security-Hardened-blue)]()
-[![Accessibility](https://img.shields.io/badge/WCAG-2.1%20AA-orange)]()
+[![CI](https://github.com/abhinavkhedwal4-maker/ecoiq/actions/workflows/ci.yml/badge.svg)](https://github.com/abhinavkhedwal4-maker/ecoiq/actions)
 [![License](https://img.shields.io/badge/License-MIT-green)]()
 
 ---
@@ -102,7 +99,7 @@ ecoiq/
 │   └── quiz.html
 ├── css/                        # Page-specific stylesheets
 └── tests/
-    └── app.test.js             # 85 comprehensive tests (zero dependencies)
+    └── app.test.js             # Comprehensive test suite (zero dependencies)
 ```
 
 ---
@@ -144,25 +141,24 @@ ecoiq/
 npm test
 ```
 
-**85 tests**, zero external dependencies, runs in Node.js:
+Run with zero external dependencies, in plain Node.js. The suite covers:
 
-| Suite | Tests | Covers |
-|-------|-------|--------|
-| Transport Calculations | 8 | Emission factors, public transport reduction, edge cases |
-| Food Calculations | 6 | Diet types, beef frequency, food waste scaling |
-| Energy Calculations | 5 | Grid factor, renewable reduction, HVAC impact |
-| Shopping Calculations | 4 | Clothes/electronics frequency, repair bonus |
-| Total Footprint | 3 | Sum accuracy, always-positive, high vs low lifestyle |
-| Quiz Grade System | 7 | All grade boundaries |
-| Eco Level System | 6 | All level boundaries (0/100/300/600/1000 pts) |
-| Input Validation | 13 | XSS, SQL injection, unicode, role validation, rate limits |
-| Message Formatting | 8 | Bold, italic, code, paragraphs, null input |
-| Data & Utility | 5 | Date keys, active day deduplication |
-| API Request Validation | 7 | Whitespace, null, object instead of array |
-| Carbon Edge Cases | 6 | Undefined inputs, zero values, linear scaling |
-| Data Integrity | 7 | ISO dates, level boundaries, HTML character escaping |
+| Suite | Covers |
+|-------|--------|
+| Transport Calculations | Emission factors, public transport reduction, edge cases |
+| Food Calculations | Diet types, beef frequency, food waste scaling |
+| Energy Calculations | Grid factor, renewable reduction, HVAC impact |
+| Shopping Calculations | Clothes/electronics frequency, repair bonus |
+| Total Footprint | Sum accuracy, always-positive, high vs low lifestyle |
+| Quiz Grade System | All grade boundaries |
+| Eco Level System | All level boundaries (0/100/300/600/1000 pts) |
+| String Sanitization | XSS escaping, ampersands, quotes, length truncation |
+| Message Formatting | Bold, italic, code, paragraphs, null input |
+| Message Validation | Role validation, malformed objects, rate limits |
+| Date Utilities | Date key format, active day deduplication |
+| Edge Cases & Robustness | Undefined inputs, extreme values, type safety |
 
-CI runs all 85 tests on every push to `main` via GitHub Actions.
+CI runs the full suite on every push to `main` via GitHub Actions — see the badge at the top of this README for current status.
 
 ---
 
@@ -177,7 +173,7 @@ CI runs all 85 tests on every push to `main` via GitHub Actions.
 
 ```bash
 # Clone
-git clone https://github.com/your-username/ecoiq.git
+git clone https://github.com/abhinavkhedwal4-maker/ecoiq.git
 cd ecoiq
 
 # Install
@@ -222,14 +218,14 @@ Set `GROQ_API_KEY` and `GROQ_MODEL` in Vercel → Settings → Environment Varia
 
 ## 10. How This Maps to the Evaluation Rubric
 
-| Criterion | Score Target | Where to Look |
-|-----------|-------------|---------------|
-| **Code Quality** | 98 | Pure functions in `js/carbon.js`; JSDoc on every function; named constants with cited sources; `shared.js` eliminates duplication; consistent `'use strict'`; defensive null checks throughout |
-| **Security** | 99 | `api/chat.js` + `server.js` — validated proxy, rate limiting, XSS sanitization, security headers, body size limits, path traversal prevention, `.env` isolation |
-| **Efficiency** | 100 | `DocumentFragment` for all DOM batch updates; `throttleRaf` for scroll/resize; `debounce` on inputs; Chart instances destroyed before recreate; `Map`-based rate limit store with auto-cleanup |
-| **Testing** | 97 | `tests/app.test.js` — 85 tests, zero deps, pure Node.js; `.github/workflows/ci.yml` — CI on every push; covers calculations, validation, security, formatting, edge cases |
-| **Accessibility** | 99 | Skip links on all 5 pages; full ARIA landmark/role/live-region coverage; keyboard navigation; focus management; reduced-motion support; 4.5:1 contrast |
-| **Problem Statement Alignment** | 99 | Understand (calculator) → Track (tracker + Firestore) → Reduce (AI tips + chatbot) loop; Indian context (₹ electricity, India grid factor, local produce); gamification drives habit formation |
+| Criterion | Where to Look |
+|-----------|---------------|
+| **Code Quality** | Pure functions in `js/carbon.js`; JSDoc on every function; named constants with cited sources; `js/shared.js` centralizes shared logic (sanitization, formatting, date utilities) to eliminate duplication across modules; consistent `'use strict'`; defensive null checks throughout |
+| **Security** | `api/chat.js` + `server.js` — validated proxy, rate limiting, XSS sanitization, security headers, body size limits, path traversal prevention, `.env` isolation (never committed) |
+| **Efficiency** | `DocumentFragment` for batch DOM updates in tracker rendering; Chart.js instances destroyed before recreation to prevent memory leaks; `Map`-based rate limit store with periodic auto-cleanup |
+| **Testing** | `tests/app.test.js` — zero-dependency test suite covering calculations, validation, security, formatting, and edge cases; `.github/workflows/ci.yml` runs the suite on every push |
+| **Accessibility** | Skip links on all 5 pages; ARIA landmark/role/live-region coverage; keyboard navigation on custom controls; focus management in the chat modal; reduced-motion support; 4.5:1 contrast ratio |
+| **Problem Statement Alignment** | Understand (calculator) → Track (tracker + Firestore) → Reduce (AI tips + chatbot) loop; Indian context (₹ electricity billing, India grid emission factor, local produce); gamification (streaks, points, eco levels) drives habit formation |
 
 ---
 
@@ -240,8 +236,17 @@ The average Indian produces ~2.5 tonnes CO₂/year vs the sustainable target of 
 - **Identify** highest emission categories in minutes
 - **Act** with 27 trackable daily eco-actions
 - **Measure** progress with CO₂ saved, streak counts, and eco levels
-- **Learn** through 15 quiz questions with source-cited explanations
+- **Learn** through a 15-question quiz with source-cited explanations
 
 ---
 
-*Built with 💚 for Google Prompt War 2026 — Challenge 3*
+## 12. Assumptions
+
+- Emission factors are representative public averages for awareness and education, not certified carbon accounting.
+- Home energy estimates derive from monthly electricity bill amount, using an approximate ₹/kWh conversion for urban India.
+- Flights are entered as an annual count and converted using a representative average per-trip emission figure.
+- No formal login is required to use the Calculator, Tracker, or Quiz; Google Sign-In is optional and enables cross-device sync via Firestore.
+
+---
+
+*Built for Google Prompt War 2026 — Challenge 3*
