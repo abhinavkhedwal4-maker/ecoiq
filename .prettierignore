@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Cache
+.cache/
+.pytest_cache/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Package manager
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Vercel
+.vercel/
+
+# Test coverage
+coverage/
+
+# Temporary files
+*.tmp
+*.temp

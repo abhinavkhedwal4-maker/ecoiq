@@ -16,103 +16,226 @@
  *     2022 per-capita consumption emissions
  *
  * @module carbon
+ * @version 1.1.0
  */
 
 'use strict';
 
-// ─── Transport ──────────────────────────────────────────────────────────────
-// kg CO2e per km driven (single occupant). Source: DEFRA 2023 average car
-// factors, adapted for Indian fuel mix context.
-const CARBON_FACTORS = {
-  petrol: 0.21,   // kg CO2e/km — DEFRA 2023 petrol car average
-  diesel: 0.17,   // kg CO2e/km — DEFRA 2023 diesel car average
-  electric: 0.05, // kg CO2e/km — includes grid generation emissions (India grid mix)
+// ─── Time Conversion Constants ──────────────────────────────────────────────
+/** Number of weeks in a standard year */
+const WEEKS_PER_YEAR = 52;
+
+/** Number of months in a standard year */
+const MONTHS_PER_YEAR = 12;
+
+/** Conversion factor from kilograms to tonnes (1000 kg = 1 tonne) */
+const KG_TO_TONNES = 1000;
+
+// ─── Transport Emission Factors ─────────────────────────────────────────────
+/**
+ * Carbon emission factors for different vehicle types in kg CO2e per km.
+ * Source: UK DEFRA 2023 Greenhouse Gas Conversion Factors, adapted for
+ * Indian context where applicable.
+ * @type {Readonly<Object<string, number>>}
+ */
+const CARBON_FACTORS = Object.freeze({
+  /** Petrol car average - DEFRA 2023 */
+  petrol: 0.21,
+  /** Diesel car average - DEFRA 2023 */
+  diesel: 0.17,
+  /** Electric car including India grid emissions (0.82 kg CO2e/kWh) */
+  electric: 0.05,
+  /** No personal vehicle */
   none: 0,
-};
+});
 
-// Average kg CO2e per one-way flight, representative short/medium-haul trip.
-// Source: DEFRA 2023 per-passenger flight conversion factors.
-const FLIGHT_CO2_PER_TRIP = 0.9; // tonnes CO2e per flight (annualized average)
+/**
+ * Average CO2e emissions per one-way flight in tonnes.
+ * Represents a typical short to medium-haul domestic/regional flight.
+ * Source: DEFRA 2023 per-passenger flight conversion factors.
+ * @type {number}
+ */
+const FLIGHT_CO2_PER_TRIP = 0.9;
 
-// Public transport reduces personal transport footprint vs. solo car travel.
-// Source: DEFRA 2023 bus/rail per-passenger-km averages relative to car.
-const PUBLIC_TRANSPORT_REDUCTION = 0.85; // 15% reduction factor
+/**
+ * Reduction factor when using public transport vs. solo car travel.
+ * Public transport (bus/rail) produces ~15% of solo car emissions per passenger-km.
+ * Source: DEFRA 2023 bus/rail per-passenger-km averages.
+ * @type {number}
+ */
+const PUBLIC_TRANSPORT_REDUCTION = 0.85;
 
-// ─── Diet ───────────────────────────────────────────────────────────────────
-// Annual tonnes CO2e attributable to diet type (food production footprint).
-// Source: Scarborough et al. 2014 / Our World in Data dietary footprints.
-const DIET_BASE = {
-  vegan: 1.5,       // tonnes CO2e/year
-  vegetarian: 1.7,  // tonnes CO2e/year
-  mixed: 2.5,       // tonnes CO2e/year
-  meat_heavy: 3.3,  // tonnes CO2e/year
-};
+// ─── Diet Emission Factors ──────────────────────────────────────────────────
+/**
+ * Base annual CO2e emissions by diet type in tonnes per year.
+ * Represents the food production footprint for different dietary patterns.
+ * Source: Scarborough et al. 2014 / Our World in Data dietary footprints.
+ * @type {Readonly<Object<string, number>>}
+ */
+const DIET_BASE = Object.freeze({
+  /** Vegan diet - plant-based only */
+  vegan: 1.5,
+  /** Vegetarian diet - includes dairy and eggs */
+  vegetarian: 1.7,
+  /** Mixed diet - balanced meat and plant consumption */
+  mixed: 2.5,
+  /** Meat-heavy diet - frequent red meat consumption */
+  meat_heavy: 3.3,
+});
 
-// Additional annual tonnes CO2e from beef/lamb consumption frequency.
-// Beef has ~10x the footprint of poultry per kg. Source: Our World in Data.
-const BEEF_EXTRA = {
+/**
+ * Additional annual CO2e emissions from beef/lamb consumption frequency in tonnes.
+ * Beef has approximately 10x the carbon footprint of poultry per kg.
+ * Source: Our World in Data food emissions database.
+ * @type {Readonly<Object<string, number>>}
+ */
+const BEEF_EXTRA = Object.freeze({
+  /** No beef/lamb consumption */
   never: 0,
-  once: 0.3,   // 1-2x per week
-  often: 0.8,  // 3-5x per week
+  /** 1-2 times per week */
+  once: 0.3,
+  /** 3-5 times per week */
+  often: 0.8,
+  /** Daily consumption */
   daily: 1.5,
-};
+});
 
-// Additional annual tonnes CO2e from food waste (methane from landfill decay).
-// Source: EPA WARM model, food waste category.
-const WASTE_EXTRA = {
+/**
+ * Additional annual CO2e emissions from food waste level in tonnes.
+ * Food waste produces methane during landfill decomposition.
+ * Source: EPA WARM (Waste Reduction Model) food waste category.
+ * @type {Readonly<Object<string, number>>}
+ */
+const WASTE_EXTRA = Object.freeze({
+  /** Minimal food waste */
   low: 0,
+  /** Moderate food waste */
   medium: 0.2,
+  /** High food waste */
   high: 0.5,
-};
+});
 
-// ─── Energy ─────────────────────────────────────────────────────────────────
-// India grid emission factor: kg CO2e per kWh of electricity consumed.
-// Source: Central Electricity Authority (CEA) India, CO2 Baseline Database,
-// reflecting coal-heavy grid mix (~0.82 kg CO2e/kWh national average).
+// ─── Energy Emission Factors ────────────────────────────────────────────────
+/**
+ * India electricity grid emission factor in kg CO2e per kWh.
+ * Reflects the coal-heavy grid mix with national average of 0.82 kg CO2e/kWh.
+ * Source: Central Electricity Authority (CEA) India, CO2 Baseline Database 2023.
+ * @type {number}
+ */
 const GRID_EMISSION_FACTOR_KG_PER_KWH = 0.82;
 
-// Approximate cost per kWh used to back-calculate consumption from a monthly
-// electricity bill (₹8/kWh average residential tariff, urban India).
+/**
+ * Average residential electricity cost in rupees per kWh.
+ * Used to estimate consumption from monthly bill amount.
+ * Source: Urban India average residential tariff 2023.
+ * @type {number}
+ */
 const RUPEES_PER_KWH = 8;
 
-// Switching to renewable energy (solar) reduces grid-tied emissions by ~70%.
-const RENEWABLE_REDUCTION_FACTOR = 0.3; // i.e. 70% reduction
+/**
+ * Emission reduction factor when using renewable energy (solar/wind).
+ * Renewable energy reduces grid-tied emissions by approximately 70%.
+ * Remaining 30% accounts for manufacturing and installation footprint.
+ * @type {number}
+ */
+const RENEWABLE_REDUCTION_FACTOR = 0.3;
 
-// Additional annual tonnes CO2e from HVAC (heating/cooling) usage intensity.
-const HVAC_EXTRA = {
+/**
+ * Additional annual CO2e emissions from HVAC usage intensity in tonnes.
+ * Heating and cooling systems significantly impact energy consumption.
+ * @type {Readonly<Object<string, number>>}
+ */
+const HVAC_EXTRA = Object.freeze({
+  /** Minimal HVAC usage */
   low: 0,
+  /** Moderate HVAC usage */
   medium: 0.3,
+  /** Heavy HVAC usage */
   high: 0.8,
-};
+});
 
-// ─── Shopping ───────────────────────────────────────────────────────────────
-// Annual tonnes CO2e attributable to clothing purchase frequency.
-// Source: derived from EXIOBASE-style consumer-spend emission intensity.
-const CLOTHES_SCORE = {
+// ─── Shopping Emission Factors ──────────────────────────────────────────────
+/**
+ * Annual CO2e emissions from clothing purchase frequency in tonnes.
+ * Accounts for manufacturing, transportation, and disposal footprint.
+ * Source: EXIOBASE consumer-spend emission intensity factors.
+ * @type {Readonly<Object<string, number>>}
+ */
+const CLOTHES_SCORE = Object.freeze({
+  /** Rarely buy new clothes (few times per year) */
   rarely: 0.3,
+  /** Monthly clothing purchases */
   monthly: 0.8,
+  /** Weekly clothing purchases */
   weekly: 1.5,
-};
+});
 
-// Annual tonnes CO2e attributable to electronics purchase frequency
-// (manufacturing + e-waste footprint dominates over usage phase).
-const ELECTRONICS_SCORE = {
+/**
+ * Annual CO2e emissions from electronics purchase frequency in tonnes.
+ * Manufacturing and e-waste footprint dominates over usage phase.
+ * Source: EXIOBASE consumer electronics emission factors.
+ * @type {Readonly<Object<string, number>>}
+ */
+const ELECTRONICS_SCORE = Object.freeze({
+  /** Rarely buy electronics (every few years) */
   rarely: 0.2,
+  /** Yearly electronics purchases */
   yearly: 0.5,
+  /** Frequent electronics purchases */
   often: 1.2,
-};
+});
 
-// Repairing instead of replacing reduces embodied-carbon shopping footprint.
-const REPAIR_BONUS = {
+/**
+ * CO2e impact of repair vs. replace behavior in tonnes per year.
+ * Repairing items reduces embodied carbon from manufacturing new products.
+ * Negative values represent emissions avoided.
+ * @type {Readonly<Object<string, number>>}
+ */
+const REPAIR_BONUS = Object.freeze({
+  /** Always repair instead of replace */
   always: -0.3,
+  /** Sometimes repair */
   sometimes: 0,
+  /** Never repair, always replace */
   never: 0.2,
-};
+});
 
-// ─── Reference points ───────────────────────────────────────────────────────
-// Global average per-capita annual footprint, used for comparison.
-// Source: Our World in Data, 2022 per-capita consumption emissions.
+// ─── Reference Thresholds ───────────────────────────────────────────────────
+/**
+ * Global average per-capita annual carbon footprint in tonnes CO2e.
+ * Used as a comparison benchmark for individual footprints.
+ * Source: Our World in Data, 2022 per-capita consumption emissions.
+ * @type {number}
+ */
 const GLOBAL_AVG_ANNUAL_TONNES = 4.7;
+
+/**
+ * Excellent footprint threshold in tonnes CO2e per year.
+ * Below this value indicates strong sustainability practices.
+ * @type {number}
+ */
+const EXCELLENT_THRESHOLD = 2.0;
+
+/**
+ * Good footprint threshold in tonnes CO2e per year.
+ * Below this value indicates above-average sustainability.
+ * @type {number}
+ */
+const GOOD_THRESHOLD = 4.0;
+
+/**
+ * Average footprint threshold in tonnes CO2e per year.
+ * Around the global average, room for improvement.
+ * @type {number}
+ */
+const AVERAGE_THRESHOLD = 6.0;
+
+/**
+ * High footprint threshold in tonnes CO2e per year.
+ * Above this indicates significant opportunity for reduction.
+ * @type {number}
+ */
+const HIGH_THRESHOLD = 10.0;
 
 /**
  * Calculates annual transport CO2e emissions in tonnes.
@@ -125,7 +248,7 @@ const GLOBAL_AVG_ANNUAL_TONNES = 4.7;
  */
 export function calcTransport(answers) {
   const factor = CARBON_FACTORS[answers.carType] ?? CARBON_FACTORS.petrol;
-  const carCO2 = (answers.carKm * 52 * factor) / 1000;
+  const carCO2 = (answers.carKm * WEEKS_PER_YEAR * factor) / KG_TO_TONNES;
   const flightCO2 = answers.flightsPerYear * FLIGHT_CO2_PER_TRIP;
   const ptReduction = answers.publicTransport === 'yes' ? PUBLIC_TRANSPORT_REDUCTION : 1;
   return Math.max(0, (carCO2 + flightCO2) * ptReduction);
@@ -158,10 +281,10 @@ export function calcFood(answers) {
 export function calcEnergy(answers) {
   const monthly = answers.electricityBill;
   const kwhEstimate = monthly / RUPEES_PER_KWH;
-  const annualKwh = kwhEstimate * 12;
-  let energyCO2 = (annualKwh * GRID_EMISSION_FACTOR_KG_PER_KWH) / 1000;
+  const annualKwh = kwhEstimate * MONTHS_PER_YEAR;
+  let energyCO2 = (annualKwh * GRID_EMISSION_FACTOR_KG_PER_KWH) / KG_TO_TONNES;
   if (answers.renewable === 'yes') energyCO2 *= RENEWABLE_REDUCTION_FACTOR;
-  return energyCO2 + (HVAC_EXTRA[answers.hvac] ?? 0.3);
+  return energyCO2 + (HVAC_EXTRA[answers.hvac] ?? HVAC_EXTRA.medium);
 }
 
 /**
@@ -187,25 +310,25 @@ export function calcShopping(answers) {
  * @returns {{emoji: string, comparison: string}} Grade emoji and comparison message
  */
 export function getGrade(total) {
-  if (total < 2) {
+  if (total < EXCELLENT_THRESHOLD) {
     return {
       emoji: '🌟',
       comparison: `Amazing! You are well below the global average of ${GLOBAL_AVG_ANNUAL_TONNES}t and making strong choices.`,
     };
   }
-  if (total < 4) {
+  if (total < GOOD_THRESHOLD) {
     return {
       emoji: '🌿',
       comparison: `Great! You are below the global average of ${GLOBAL_AVG_ANNUAL_TONNES}t. Keep building momentum.`,
     };
   }
-  if (total < 6) {
+  if (total < AVERAGE_THRESHOLD) {
     return {
       emoji: '🌍',
       comparison: `You are close to the global average of ${GLOBAL_AVG_ANNUAL_TONNES}t. A few simple changes will help.`,
     };
   }
-  if (total < 10) {
+  if (total < HIGH_THRESHOLD) {
     return {
       emoji: '⚠️',
       comparison: `Above the global average of ${GLOBAL_AVG_ANNUAL_TONNES}t. There is good opportunity to lower your impact.`,

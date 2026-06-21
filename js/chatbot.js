@@ -1,18 +1,35 @@
 /**
  * @fileoverview EcoIQ AI Chatbot
- * @description Secure chatbot using Groq API via server proxy
+ * @description Secure chatbot interface using Groq LLaMA 3.3 70B via server proxy.
+ *              Implements client-side rate limiting, input validation, and
+ *              accessibility features for an inclusive chat experience.
  * @module chatbot
+ * @version 1.1.0
  */
 
 'use strict';
 
 import { sanitizeString, formatMessage } from './shared.js';
 
-const ENDPOINT       = '/api/chat';
+// ─── Configuration Constants ─────────────────────────────────────────────────
+
+/** API endpoint for chat requests (proxied through server) */
+const ENDPOINT = '/api/chat';
+
+/** Maximum message length in characters */
 const MAX_MSG_LENGTH = 500;
-const RATE_LIMIT     = 10;
+
+/** Maximum messages allowed per rate limit window */
+const RATE_LIMIT = 10;
+
+/** Rate limit window duration in milliseconds (1 minute) */
 const RATE_WINDOW_MS = 60_000;
 
+/**
+ * System prompt that defines EcoAI's personality and capabilities.
+ * Instructs the AI on how to respond to user queries about sustainability.
+ * @type {string}
+ */
 const SYSTEM_PROMPT = `You are EcoAI, an expert sustainability and carbon footprint assistant. Help users:
 - Understand and reduce their personal carbon footprint
 - Learn about sustainable living practices
@@ -28,18 +45,42 @@ Guidelines:
 - Keep responses concise (3-4 paragraphs max)
 - End with one concrete action the user can take today`;
 
-/** @type {Array<{role:string, content:string}>} */
-let conversationHistory = [];
-
-/** @type {Array<number>} */
-const messageTimes = [];
-
-/** @type {boolean} */
-let isProcessing = false;
+// ─── State Management ────────────────────────────────────────────────────────
 
 /**
- * Checks client-side rate limit
- * @returns {boolean}
+ * Conversation history maintained for context in multi-turn conversations.
+ * @type {Array<{role: string, content: string}>}
+ */
+let conversationHistory = [];
+
+/**
+ * Timestamps of recent messages for rate limiting.
+ * @type {Array<number>}
+ */
+const messageTimes = [];
+
+/**
+ * Flag indicating if a message is currently being processed.
+ * Prevents concurrent requests.
+ * @type {boolean}
+ */
+let isProcessing = false;
+
+// ─── Rate Limiting ───────────────────────────────────────────────────────────
+
+/**
+ * Checks if the user has exceeded the client-side rate limit.
+ * Uses a sliding window approach to track message timestamps.
+ *
+ * @function checkClientRateLimit
+ * @returns {boolean} True if within rate limit, false if exceeded
+ *
+ * @example
+ * if (checkClientRateLimit()) {
+ *   // Send message
+ * } else {
+ *   // Show rate limit error
+ * }
  */
 function checkClientRateLimit() {
   const now    = Date.now();
@@ -51,9 +92,20 @@ function checkClientRateLimit() {
 }
 
 /**
- * Validates message before sending
- * @param {string} message
- * @returns {{valid:boolean, error?:string}}
+ * Validates a user message before sending to the API.
+ * Checks for empty messages, type errors, and length limits.
+ *
+ * @function validateMessage
+ * @param {string} message - User's message to validate
+ * @returns {{valid: boolean, error?: string}} Validation result
+ *
+ * @example
+ * const result = validateMessage('Hello EcoAI');
+ * if (result.valid) {
+ *   // Send message
+ * } else {
+ *   // Show error: result.error
+ * }
  */
 function validateMessage(message) {
   if (!message || typeof message !== 'string') return { valid: false, error: 'Please enter a message.' };
@@ -63,9 +115,17 @@ function validateMessage(message) {
 }
 
 /**
- * Appends a chat bubble to the messages container
- * @param {'user'|'ai'} role
- * @param {string} text
+ * Appends a chat bubble to the messages container with proper ARIA attributes.
+ * Handles both user and AI messages with different styling and formatting.
+ *
+ * @function appendMessage
+ * @param {'user'|'ai'} role - Message sender role
+ * @param {string} text - Message content
+ * @returns {void}
+ *
+ * @example
+ * appendMessage('user', 'How can I reduce my carbon footprint?');
+ * appendMessage('ai', 'Here are 5 ways to reduce your footprint...');
  */
 function appendMessage(role, text) {
   const container = document.getElementById('chatMessages');
@@ -98,8 +158,16 @@ function appendMessage(role, text) {
 }
 
 /**
- * Shows typing indicator
- * @returns {string|null}
+ * Displays an animated typing indicator while AI is processing.
+ * Returns the indicator's ID for later removal.
+ *
+ * @function showTyping
+ * @returns {string|null} ID of the typing indicator element, or null if container not found
+ *
+ * @example
+ * const typingId = showTyping();
+ * // ... wait for AI response ...
+ * removeTyping(typingId);
  */
 function showTyping() {
   const container = document.getElementById('chatMessages');
@@ -125,8 +193,14 @@ function showTyping() {
 }
 
 /**
- * Removes typing indicator
- * @param {string|null} id
+ * Removes the typing indicator from the chat.
+ *
+ * @function removeTyping
+ * @param {string|null} id - ID of the typing indicator to remove
+ * @returns {void}
+ *
+ * @example
+ * removeTyping('typing-1234567890');
  */
 function removeTyping(id) {
   if (!id) return;
@@ -134,8 +208,16 @@ function removeTyping(id) {
 }
 
 /**
- * Updates send button state
- * @param {boolean} disabled
+ * Updates the send button's disabled state and ARIA attributes.
+ * Provides visual and accessibility feedback during message processing.
+ *
+ * @function setSendButtonState
+ * @param {boolean} disabled - Whether the button should be disabled
+ * @returns {void}
+ *
+ * @example
+ * setSendButtonState(true);  // Disable during processing
+ * setSendButtonState(false); // Re-enable after response
  */
 function setSendButtonState(disabled) {
   const btn = document.getElementById('sendBtn');
@@ -146,8 +228,15 @@ function setSendButtonState(disabled) {
 }
 
 /**
- * Announces to screen readers
- * @param {string} message
+ * Announces a message to screen readers using an ARIA live region.
+ * Creates the announcer element if it doesn't exist.
+ *
+ * @function announceToScreenReader
+ * @param {string} message - Message to announce
+ * @returns {void}
+ *
+ * @example
+ * announceToScreenReader('Message sent successfully');
  */
 function announceToScreenReader(message) {
   let el = document.getElementById('sr-announcer');
@@ -164,8 +253,23 @@ function announceToScreenReader(message) {
 }
 
 /**
- * Sends user message to EcoAI
+ * Sends a user message to the EcoAI chatbot via the server proxy.
+ *
+ * Workflow:
+ * 1. Validates message and checks rate limits
+ * 2. Sanitizes input and adds to conversation history
+ * 3. Shows typing indicator
+ * 4. Sends request to /api/chat endpoint
+ * 5. Displays AI response
+ * 6. Handles errors gracefully
+ *
+ * @async
+ * @function sendMessage
  * @returns {Promise<void>}
+ *
+ * @example
+ * // Called when user clicks send button or presses Enter
+ * await sendMessage();
  */
 async function sendMessage() {
   if (isProcessing) return;

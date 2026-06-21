@@ -1,16 +1,20 @@
 {
   "name": "ecoiq",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "AI-powered carbon footprint tracker — Google Prompt War 2026 Challenge 3",
-  "main": "server.js",
+  "type": "module",
+  "main": "server.cjs",
   "engines": {
     "node": ">=18.0.0"
   },
   "scripts": {
-    "start": "node server.js",
+    "start": "node server.cjs",
     "test": "node tests/app.test.js",
-    "lint": "eslint js/ api/ server.js --ext .js",
-    "lint:fix": "eslint js/ api/ server.js --ext .js --fix"
+    "lint": "eslint js/ api/ server.cjs --ext .js,.cjs",
+    "lint:fix": "eslint js/ api/ server.cjs --ext .js,.cjs --fix",
+    "format": "prettier --write \"**/*.{js,json,html,css,md}\"",
+    "format:check": "prettier --check \"**/*.{js,json,html,css,md}\"",
+    "quality": "npm run lint && npm run format:check && npm test"
   },
   "keywords": ["carbon-footprint", "sustainability", "ai", "groq", "firebase"],
   "license": "MIT",
@@ -18,6 +22,7 @@
     "dotenv": "^16.4.5"
   },
   "devDependencies": {
-    "eslint": "^8.57.0"
+    "eslint": "^8.57.0",
+    "prettier": "^3.1.0"
   }
 }

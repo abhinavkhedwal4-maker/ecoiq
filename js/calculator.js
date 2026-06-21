@@ -4,6 +4,7 @@
  *              carbon calculation functions, renders results and a doughnut
  *              chart, fetches AI tips, and optionally syncs to Firestore.
  * @module calculator
+ * @version 1.1.0
  */
 
 'use strict';
@@ -40,7 +41,23 @@ const CHART_COLORS = Object.freeze({
  * Mutable store for all user answers across the wizard steps.
  * Pill selections update this object directly; numeric inputs are read on step
  * transition and on final calculation.
- * @type {Object}
+ *
+ * @typedef {Object} CalculatorAnswers
+ * @property {number} carKm - Weekly kilometers driven
+ * @property {string} carType - Vehicle type (petrol|diesel|electric|none)
+ * @property {number} flightsPerYear - Annual flight count
+ * @property {string} publicTransport - Uses public transport (yes|no)
+ * @property {string} diet - Diet type (vegan|vegetarian|mixed|meat_heavy)
+ * @property {string} beefFreq - Beef consumption frequency
+ * @property {string} foodWaste - Food waste level (low|medium|high)
+ * @property {number} electricityBill - Monthly electricity bill in ₹
+ * @property {string} renewable - Uses renewable energy (yes|no)
+ * @property {string} hvac - HVAC usage level (low|medium|high)
+ * @property {string} clothes - Clothing purchase frequency
+ * @property {string} electronics - Electronics purchase frequency
+ * @property {string} repair - Repair vs replace preference
+ *
+ * @type {CalculatorAnswers}
  */
 const answers = {
   carKm           : 0,
@@ -82,8 +99,15 @@ document.querySelectorAll('.pill').forEach((pill) => {
 // ─── Step navigation ─────────────────────────────────────────────────────────
 
 /**
- * Reads numeric inputs for the step being left, then transitions forward.
- * @param {number} nextStep - Target step number (1–4)
+ * Advances to the next step in the calculator wizard.
+ * Syncs numeric inputs from the current step before transitioning.
+ *
+ * @function nextStep
+ * @param {number} step - Target step number (1–4)
+ * @returns {void}
+ *
+ * @example
+ * nextStep(2); // Move from step 1 to step 2
  */
 window.nextStep = function nextStep(step) {
   syncNumericInputs(currentStep);
@@ -94,8 +118,15 @@ window.nextStep = function nextStep(step) {
 };
 
 /**
- * Transitions backward without syncing inputs (no data loss risk).
- * @param {number} prevStep - Target step number (1–4)
+ * Returns to a previous step in the calculator wizard.
+ * Does not sync inputs as user may want to change previous answers.
+ *
+ * @function prevStep
+ * @param {number} step - Target step number (1–4)
+ * @returns {void}
+ *
+ * @example
+ * prevStep(1); // Return to step 1 from step 2
  */
 window.prevStep = function prevStep(step) {
   transitionStep(currentStep, step);
@@ -104,8 +135,15 @@ window.prevStep = function prevStep(step) {
 };
 
 /**
- * Reads numeric inputs from a given step into the answers store.
- * @param {number} step - Step whose inputs should be synced
+ * Reads numeric input values from a specific step and updates the answers object.
+ * Only syncs inputs for steps that have numeric fields (steps 1 and 3).
+ *
+ * @function syncNumericInputs
+ * @param {number} step - Step number whose inputs should be synced (1-4)
+ * @returns {void}
+ *
+ * @example
+ * syncNumericInputs(1); // Syncs carKm and flightsPerYear
  */
 function syncNumericInputs(step) {
   if (step === 1) {
@@ -117,9 +155,16 @@ function syncNumericInputs(step) {
 }
 
 /**
- * Swaps the active CSS class between two step panels.
- * @param {number} from - Outgoing step number
- * @param {number} to   - Incoming step number
+ * Transitions between wizard steps by toggling CSS classes.
+ * Updates progress indicators and manages step visibility.
+ *
+ * @function transitionStep
+ * @param {number} from - Outgoing step number (1-4)
+ * @param {number} to - Incoming step number (1-4)
+ * @returns {void}
+ *
+ * @example
+ * transitionStep(1, 2); // Hide step 1, show step 2
  */
 function transitionStep(from, to) {
   document.getElementById(`step${from}`)?.classList.remove('active');
@@ -133,8 +178,14 @@ function transitionStep(from, to) {
 }
 
 /**
- * Updates the progress bar fill width.
- * @param {number} step - Current step (1–4)
+ * Updates the visual progress bar to reflect current wizard position.
+ *
+ * @function updateProgressBar
+ * @param {number} step - Current step number (1-4)
+ * @returns {void}
+ *
+ * @example
+ * updateProgressBar(3); // Sets progress bar to 75%
  */
 function updateProgressBar(step) {
   const fill = document.getElementById('progressFill');
@@ -144,9 +195,23 @@ function updateProgressBar(step) {
 // ─── Calculation & results ───────────────────────────────────────────────────
 
 /**
- * Runs all four carbon calculations, renders the results panel, saves to
- * Firestore (if authenticated), and fetches AI tips.
+ * Executes the complete carbon footprint calculation workflow.
+ *
+ * Performs the following operations:
+ * 1. Syncs final numeric inputs
+ * 2. Calculates emissions for all four categories
+ * 3. Renders results with grade and category breakdown
+ * 4. Generates Chart.js visualization
+ * 5. Saves results to Firestore (if authenticated)
+ * 6. Fetches personalized AI reduction tips
+ *
+ * @async
+ * @function calculateFootprint
  * @returns {Promise<void>}
+ *
+ * @example
+ * await calculateFootprint();
+ * // Results displayed, chart rendered, AI tips loaded
  */
 window.calculateFootprint = async function calculateFootprint() {
   syncNumericInputs(4);
@@ -175,9 +240,15 @@ window.calculateFootprint = async function calculateFootprint() {
 };
 
 /**
- * Populates the grade emoji and comparison message in the results panel.
- * @param {number} total                - Total annual CO2e (tonnes)
- * @param {{emoji:string, comparison:string}} grade - Grade object from getGrade()
+ * Renders the carbon footprint grade with emoji and comparison text.
+ *
+ * @function renderGrade
+ * @param {number} total - Total annual CO2e emissions in tonnes
+ * @param {{emoji: string, comparison: string}} grade - Grade object from getGrade()
+ * @returns {void}
+ *
+ * @example
+ * renderGrade(3.5, { emoji: '🌿', comparison: 'Great! Below average.' });
  */
 function renderGrade(total, grade) {
   const emojiEl      = document.getElementById('resultEmoji');
@@ -190,10 +261,16 @@ function renderGrade(total, grade) {
 }
 
 /**
- * Animates a single category progress bar and sets its value label.
- * @param {string} category - Category key (transport | food | energy | shopping)
- * @param {number} value    - Category CO2e value in tonnes
- * @param {number} total    - Total CO2e for calculating the percentage
+ * Renders and animates a single category progress bar with ARIA attributes.
+ *
+ * @function renderCategoryBar
+ * @param {string} category - Category key (transport|food|energy|shopping)
+ * @param {number} value - Category CO2e value in tonnes
+ * @param {number} total - Total CO2e for percentage calculation
+ * @returns {void}
+ *
+ * @example
+ * renderCategoryBar('transport', 2.5, 10.0); // Renders 25% bar
  */
 function renderCategoryBar(category, value, total) {
   const pct    = total > 0 ? Math.round((value / total) * 100) : 0;
@@ -213,13 +290,19 @@ function renderCategoryBar(category, value, total) {
 // ─── Chart ───────────────────────────────────────────────────────────────────
 
 /**
- * Renders (or re-renders) the results doughnut chart.
- * Destroys any previous Chart.js instance to avoid canvas reuse warnings.
+ * Creates or updates the results doughnut chart using Chart.js.
+ * Properly destroys previous instances to prevent memory leaks.
  *
- * @param {number} transport - Transport CO2e (tonnes)
- * @param {number} food      - Food CO2e (tonnes)
- * @param {number} energy    - Energy CO2e (tonnes)
- * @param {number} shopping  - Shopping CO2e (tonnes)
+ * @function renderResultChart
+ * @param {number} transport - Transport CO2e in tonnes
+ * @param {number} food - Food CO2e in tonnes
+ * @param {number} energy - Energy CO2e in tonnes
+ * @param {number} shopping - Shopping CO2e in tonnes
+ * @returns {void}
+ *
+ * @example
+ * renderResultChart(2.5, 1.8, 1.2, 0.8);
+ * // Creates doughnut chart with 4 segments
  */
 function renderResultChart(transport, food, energy, shopping) {
   const canvas = document.getElementById('resultChart');
@@ -275,15 +358,22 @@ function renderResultChart(transport, food, energy, shopping) {
 // ─── AI Tips ─────────────────────────────────────────────────────────────────
 
 /**
- * Fetches personalised carbon-reduction tips from the EcoAI backend and
- * renders them in the results panel.
+ * Fetches personalized carbon reduction tips from the Groq AI API.
+ * Constructs a detailed prompt with user's footprint breakdown and
+ * renders the AI response in the results panel.
  *
- * @param {number} total     - Total annual CO2e (tonnes)
- * @param {number} transport - Transport component
- * @param {number} food      - Food component
- * @param {number} energy    - Energy component
- * @param {number} shopping  - Shopping component
+ * @async
+ * @function fetchAITips
+ * @param {number} total - Total annual CO2e in tonnes
+ * @param {number} transport - Transport emissions in tonnes
+ * @param {number} food - Food emissions in tonnes
+ * @param {number} energy - Energy emissions in tonnes
+ * @param {number} shopping - Shopping emissions in tonnes
  * @returns {Promise<void>}
+ *
+ * @example
+ * await fetchAITips(5.2, 2.1, 1.5, 1.0, 0.6);
+ * // Displays 5 personalized reduction tips
  */
 async function fetchAITips(total, transport, food, energy, shopping) {
   const loadingEl = document.getElementById('aiTipsLoading');
@@ -340,11 +430,17 @@ async function fetchAITips(total, transport, food, energy, shopping) {
 // ─── Firestore sync ──────────────────────────────────────────────────────────
 
 /**
- * Saves the calculation result to Firestore if the user is signed in.
- * Fails silently — auth is optional for the calculator feature.
+ * Persists calculation results to Firestore for authenticated users.
+ * Enables cross-device sync and historical tracking.
+ * Fails gracefully if user is not authenticated.
  *
- * @param {{transport:number, food:number, energy:number, shopping:number, total:number}} result
+ * @async
+ * @function saveToFirestore
+ * @param {{transport: number, food: number, energy: number, shopping: number, total: number}} result - Calculation results
  * @returns {Promise<void>}
+ *
+ * @example
+ * await saveToFirestore({ transport: 2.5, food: 1.8, energy: 1.2, shopping: 0.8, total: 6.3 });
  */
 async function saveToFirestore(result) {
   const user = auth.currentUser;
@@ -364,7 +460,14 @@ async function saveToFirestore(result) {
 // ─── Reset ───────────────────────────────────────────────────────────────────
 
 /**
- * Returns the wizard to step 1 and hides the results panel.
+ * Resets the calculator to its initial state.
+ * Returns to step 1 and hides the results panel.
+ *
+ * @function resetCalculator
+ * @returns {void}
+ *
+ * @example
+ * resetCalculator(); // Start over from step 1
  */
 window.resetCalculator = function resetCalculator() {
   document.getElementById('calcResult')?.classList.add('hidden');

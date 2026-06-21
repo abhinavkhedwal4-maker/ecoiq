@@ -1,20 +1,42 @@
 name: CI
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+
 jobs:
-  test:
-    name: Test Suite
+  quality:
+    name: Code Quality & Tests
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: npm
+      
       - name: Install dependencies
         run: npm install
-      - name: Run tests
+      
+      - name: Run ESLint
+        run: npm run lint
+      
+      - name: Check code formatting
+        run: npm run format:check
+      
+      - name: Run test suite
         run: npm test
+      
+      - name: Display quality summary
+        if: success()
+        run: |
+          echo "✅ All quality checks passed!"
+          echo "- ESLint: Passed"
+          echo "- Prettier: Passed"
+          echo "- Tests: Passed"

@@ -27,7 +27,45 @@
     "prefer-template": "error",
     "object-shorthand": "error",
     "arrow-body-style": ["error", "as-needed"],
-    "no-nested-ternary": "error"
+    "no-nested-ternary": "error",
+    "complexity": ["warn", 15],
+    "max-depth": ["warn", 4],
+    "max-lines-per-function": ["warn", { "max": 80, "skipBlankLines": true, "skipComments": true }],
+    "max-params": ["warn", 4],
+    "no-magic-numbers": ["warn", {
+      "ignore": [0, 1, -1, 2, 10, 100, 1000],
+      "ignoreArrayIndexes": true,
+      "ignoreDefaultValues": true,
+      "enforceConst": true
+    }],
+    "require-jsdoc": ["warn", {
+      "require": {
+        "FunctionDeclaration": true,
+        "MethodDefinition": false,
+        "ClassDeclaration": false,
+        "ArrowFunctionExpression": false,
+        "FunctionExpression": false
+      }
+    }],
+    "valid-jsdoc": ["warn", {
+      "requireReturn": false,
+      "requireReturnType": false,
+      "requireParamType": false,
+      "requireParamDescription": false,
+      "prefer": {
+        "return": "returns",
+        "arg": "param",
+        "argument": "param"
+      }
+    }],
+    "no-warning-comments": ["warn", { "terms": ["TODO", "FIXME", "XXX"], "location": "start" }],
+    "curly": ["error", "multi-line"],
+    "dot-notation": "error",
+    "no-else-return": ["error", { "allowElseIf": false }],
+    "no-lonely-if": "error",
+    "no-unneeded-ternary": "error",
+    "prefer-arrow-callback": "error",
+    "yoda": "error"
   },
   "ignorePatterns": ["node_modules/", "tests/"]
 }
